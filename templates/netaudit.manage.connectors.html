@@ -1,0 +1,60 @@
+{% extends "netaudit.manage.html" %}
+
+
+{% block modals %}
+
+<!-- Manage Connectors Modal -->
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.connectors.js') }}"></script>
+
+<div class="simple-modal-overlay" id="modalOverlay">
+    <div class="simple-modal-container" style="width: 600px;">
+
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title" id="modalTitle">Add Connector</h5>
+            <button class="close" id="closeModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="simple-modal-body">
+            <form id="modalForm" class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+                <label for="connectorName">Name</label>
+                <input type="text" id="connectorName" required>
+                <span></span>
+
+                <label for="connectorJumphostIp">Jumphost IP</label>
+                <input type="text" id="connectorJumphostIp">
+                <span></span>
+
+                <label for="connectorJumphostUser">Jumphost Username</label>
+                <input type="text" id="connectorJumphostUser">
+                <span></span>
+
+                <label for="connectorJumphostPassword">Jumphost Password</label>
+                <input type="password" id="connectorJumphostPassword">
+                <button type="button" class="toggle-password icon-only" data-target="#connectorJumphostPassword">
+                    <span class="material-icons">visibility</span>
+                </button>
+
+                <label for="connectorNetUser">Network Username</label>
+                <input type="text" id="connectorNetUser" required>
+                <span></span>
+
+                <label for="connectorNetPassword">Network Password</label>
+                <input type="password" id="connectorNetPassword">
+                <button type="button" class="toggle-password icon-only" data-target="#connectorNetPassword">
+                    <span class="material-icons">visibility</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="simple-modal-footer">
+            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
+                <span class="material-icons">save</span>Save
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

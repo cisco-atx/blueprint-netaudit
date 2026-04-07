@@ -1,0 +1,232 @@
+{% extends "netaudit.html" %}
+
+{% block main %}
+
+<!-- Include JavaScript files for audit functionalities -->
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.results.device.js') }}"></script>
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.results.js') }}"></script>
+<script src="{{ url_for('static', filename='js/atx.utils.js') }}"></script>
+
+<!-- Breadcrumb Navigation -->
+<div class="page-header">
+    <div class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+        {% if not loop.last %}
+        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+        <span class="sep">></span>
+        {% else %}
+        <span class="current">{{ crumb.title }}</span>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% block action_buttons %}
+    <div class="actions">
+        <button class="icon-text" id="runAuditBtn" data-id="{{ device_id }}" data-view="{{ view }}">
+            <span class="material-icons">play_arrow</span> Run Audit
+        </button>
+        <button class="icon-text" id="followupBtn" data-id="{{ device_id }}">
+            <span class="material-icons">edit</span> Follow Up
+        </button>
+        <button class="icon-text" id="exportAuditBtn" data-id="{{ device_id }}">
+            <span class="material-icons">archive</span> Export
+        </button>
+    </div>
+    {% endblock %}
+</div>
+
+<!-- Device Information Table -->
+<h4 style="margin:10px 0;">Device</h4>
+<div style="display: flex; flex-direction: row; gap: 20px;">
+
+    <table class="device-infotable">
+        <tbody>
+        <tr>
+            <th>Hostname</th>
+            <td>{{ device_data.hostname }}</td>
+        </tr>
+        {% for fact_name, fact_value in device_data.facts.items() %}
+        <tr>
+            <th>{{ fact_name }}</th>
+            <td>{{ fact_value }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>Date Added</th>
+            <td>{{ date_added }}</td>
+        </tr>
+        <tr>
+            <th>Last Audit</th>
+            <td>
+                <span>{{ last_audit }}</span>
+                <button class="view-raw" id="logsBtn" data-id="{{ device_id }}">View Logs</button>
+            </td>
+        </tr>
+        <tr>
+            <th>Login</th>
+            <td>
+                {% if device_data.login is true %}
+                <span class="badge status-pass">SUCCESS</span>
+                {% elif device_data.login is false %}
+                <span class="badge status-fail">FAILED</span>
+                {% else %}
+                <span class="badge status-notrun">UNKNOWN</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Overall</th>
+            <td class="text-center">
+                {% set status = status_codes.get(device_data.status) %}
+                <span class="badge status-{{ status.label | lower | replace(' ', '') }}"
+                      title="{{ status.description }}">
+                <span class="material-icons">{{ status.icon }}</span>
+                <span>{{ status.label }}</span>
+            </span>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Device Action and Comments -->
+    <table class="device-infotable">
+        <tbody>
+        <tr>
+            <th>Action Taken</th>
+            <td>{{ device_data.user_action }}</td>
+        </tr>
+        <tr>
+            <th>Comments</th>
+            <td>
+                <textarea readonly>{{ device_data.user_comments }}</textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Audit Results Table -->
+<h4 style="margin-bottom: 10px;">Audit</h4>
+<table id="deviceResultstable" class="display" style="width: 100%;">
+    <thead>
+    <tr>
+        {% for col in columns %}
+        <th>{{ col }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for data_item in dataset %}
+    <tr>
+        {% for col in columns %}
+        {% if col == "Status" %}
+        <td>
+            {% set status = status_codes.get(data_item[col], status_codes[0]) %}
+            <span class="badge status-{{ status.label | lower | replace(' ', '')  }}"
+                  title="{{ status.description }}">
+                    <span class="material-icons">{{ status.icon }}</span>
+                    <span>{{ status.label }}</span>
+                </span>
+        </td>
+        {% else %}
+        <td style="white-space: pre-wrap;">{{ data_item[col] | safe }}</td>
+        {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal for Follow-Up Actions -->
+<div id="modalOverlay" class="simple-modal-overlay">
+    <div class="simple-modal-container" style="width: 800px;">
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title">Follow Up</h5>
+            <button id="closeModalBtn" class="close">
+                <span class="material-icons">close</span>
+            </button>
+
+        </div>
+        <div class="simple-modal-body">
+            <div class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+                <label for="userActionSelect">User Action</label>
+                <select id="userActionSelect" style="width: 30%;">
+                    {% for action in std_user_actions %}
+                    <option>{{ action }}</option>
+                    {% endfor %}
+                </select>
+                <span></span>
+
+                <label for="userComment">Comments</label>
+                <textarea id="userComment" style="height: 300px; resize: none;"
+                          placeholder="Add your notes..."></textarea>
+                <span></span>
+                </form>
+            </div>
+            <div class="simple-modal-footer">
+                <button id="saveBtn" class="icon-text">
+                    <span class="material-icons">save</span> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal to view device logs -->
+<div id="logsModalOverlay" class="simple-modal-overlay">
+    <div class="simple-modal-container" style="width: 800px; height: 90vh;">
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title">Device Logs</h5>
+            <button id="closeLogsModalBtn" class="close">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="simple-modal-body" style="overflow-y: auto;">
+            {% for cmd, output in device_data.raw.items() %}
+            {% set cmd_parts = cmd.split(':') %}
+            {% if cmd_parts[0] == device_id %}
+            <h4 style="margin: 0 8px; padding:0; font-size: 11.8px;">{{ cmd_parts[1] }}</h4>
+            {% else %}
+            <h4 style="margin: 0 8px; padding:0; font-size: 11.8px;">{{ cmd }}</h4>
+            {% endif %}
+            <pre>{{ output }}</pre>
+            <hr style="margin:0 0 8px 0">
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<!-- Run Modal -->
+<div class="simple-modal-overlay" id="runModal">
+    <div class="simple-modal-container" style="width: 600px;">
+
+        <div class="simple-modal-header">
+            <div class="simple-modal-title">Run</div>
+            <button class="close" id="closeRunModal">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="simple-modal-body">
+            <form id="runModalForm">
+                <div class="form-group-row">
+                    <label>Connector</label>
+                    <select id="runModalConnectors" required>
+                        <option value="">-- Select Connector --</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="simple-modal-footer">
+            <button type="submit" form="runModalForm" id="confirmRunModal" class="icon-text">
+                <span class="material-icons">play_arrow</span> Run
+            </button>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

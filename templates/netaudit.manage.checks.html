@@ -1,0 +1,231 @@
+{% extends "netaudit.manage.html" %}
+
+{% block action_buttons %}
+<div class="actions">
+    <button class="icon-text" id="deleteSelectedBtn" style="display:none;">
+        <span class="material-icons">delete_sweep</span>Delete Selected
+    </button>
+    <button class="icon-text" id="exportSeletecBtn" style="display:none;">
+        <span class="material-icons">archive</span>Export Selected
+    </button>
+    <button class="icon-text" id="openGitModalBtn">
+        <span class="material-icons">graph_1</span>Repositories
+    </button>
+    <button class="icon-text" id="openModalBtn">
+        <span class="material-icons">add_task</span>{{ add_text }}
+    </button>
+</div>
+{% endblock %}
+
+{% block modals %}
+
+<script>
+    const authorName = "{{ session.get('username', 'Unknown User') }}";
+    const statusCodes = {{ status_codes | tojson }};
+</script>
+
+<!-- Include JavaScript for modal functionality -->
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.checks.js') }}"></script>
+
+<!-- Add Check Modal -->
+<div class="simple-modal-overlay" id="modalOverlay">
+    <div class="simple-modal-container" style="width: 1200px;">
+
+        <!-- Modal Header -->
+        <div class="simple-modal-header">
+            <div class="simple-modal-title" id="modalTitle">Add Check</div>
+            <button class="close" id="closeModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="simple-modal-body" style="position: relative; overflow: hidden;">
+            <form id="modalForm">
+                <!-- Input for File Name -->
+                <div class="form-grid" style="grid-template-columns: max-content auto;">
+                    <label>Filepath</label>
+                    <input type="text" id="checkFilename" required>
+                </div>
+
+                <!-- Textarea for Python Script -->
+                <div class="form-group" style="display: block; padding: 12px 0;">
+                    <h4 style="margin:6px;">Script (Python Code)</h4>
+                    <textarea id="checkCode"></textarea>
+                </div>
+
+                <!-- Modal Footer with File Browse and Generate Buttons -->
+                <div class="simple-modal-footer" style="justify-content: flex-start; border: none; padding: 0;">
+                    <button class="icon-text" type="button" id="browseFileBtn">
+                        <span class="material-icons">folder_open</span>Browse
+                    </button>
+                    <button class="icon-text" type="button" id="openGcModalBtn" {% if not ai_client_ready %}disabled{% endif %}>
+                        <span class="material-icons">auto_fix_high</span>Generate
+                    </button>
+                    <button class="icon-text" type="button" id="openHelpBtn">
+                        <span class="material-icons">help_outline</span>Help
+                    </button>
+                </div>
+            </form>
+
+            <!-- Right-Side Test Dock -->
+            <div id="test-dock" class="test-dock">
+                <button class="test-dock-toggle icon-text" id="test-dock-toggle">
+                    <span class="material-icons">keyboard_arrow_left</span>Validator
+                </button>
+
+                <div class="test-dock-content">
+                    <div class="badge" id="testStatus" style="font-size: 0.85rem; padding: 10px;">Ready to begin
+                        testing...
+                    </div>
+                    <div class="column-flex">
+                        <label style="margin: 0; font-size:12px; font-weight:600; padding:2px 0;"><span id="reqCommand"></span></label>
+                        <textarea id="testSampleOutput" style="resize: none;"
+                                  placeholder="Paste sample command output here..."></textarea>
+                    </div>
+                    <div class="column-flex">
+                        <h4 style="margin: 2px;">Results</h4>
+                        <div id="testResultsBox" class="test-results" hidden>
+
+                            <div class="result-section" style="display: flex; align-items: center; gap: 10px;">
+                                <label>Status</label>
+                                <span id="testStatusBadge"
+                                      class="badge"
+                                      title="">
+                                    <span id="testStatusIcon" class="material-icons"></span>
+                                    <span id="testStatusLabel"></span>
+                                </span>
+                            </div>
+
+                            <div class="result-section">
+                                <label>Observation</label>
+                                <div id="testObservation" class="result-text"></div>
+                            </div>
+
+                            <div class="result-section">
+                                <label>Comments</label>
+                                <ul id="testComments" style="height: 140px; overflow-y: auto;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="icon-text" id="runHandlerBtn" style="width:100px;">
+                        <span class="material-icons">play_arrow</span>Validate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer with Save, Cancel and Test Toggle Button -->
+        <div class="simple-modal-footer">
+            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
+                <span class="material-icons">save</span>Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Git Repos Modal -->
+<div class="simple-modal-overlay" id="gitModalOverlay">
+    <div class="simple-modal-container" style="width: 1000px;">
+
+        <!-- Modal Header -->
+        <div class="simple-modal-header">
+            <div class="simple-modal-title">Check Repositories</div>
+            <button class="close" id="closeGitModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="simple-modal-body">
+
+            <!-- Add URL Row -->
+            <div class="form-grid" style="grid-template-columns: 3fr 1fr auto;">
+                <input type="text" id="gitUrlInput" placeholder="Enter Git repository URL"/>
+                <input type="text" id="localNameInput" placeholder="Local Folder"/>
+                <button class="icon-text" id="gitAddBtn" style="margin-left: 10px;">
+                    <span class="material-icons">graph_8</span>Clone
+                </button>
+            </div>
+
+            <hr style="margin: 10px 0;">
+
+            <!-- Repository Table -->
+            <table id="gitReposTable" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th>Repository</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="gitReposBody">
+                <!-- Will be filled by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Check Modal -->
+<div class="simple-modal-overlay" id="gcModalOverlay">
+    <div class="simple-modal-container" id="gcModal" style="width: 800px;">
+
+        <!-- Modal Header -->
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title" id="gcModalTitle">Generate New Check</h5>
+            <button class="close" type="button" id="closeGcModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="simple-modal-body">
+            <form id="gcForm" class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+                <!-- Textarea for Description -->
+                <label>Description</label>
+                <textarea id="gcDescription" style="height: 80px; resize: none;"
+                          placeholder="e.g. This check verifies the NXOS version on network devices."
+                          required></textarea>
+                <span></span>
+
+                <!-- Textarea for Sample output -->
+                <label>Sample Output</label>
+                <textarea id="gcSampleOutput" style="height: 400px; resize: none;"
+                          placeholder="(Optional) Additional context for command inference, handler logic, and parsing examples"></textarea>
+                <span></span>
+            </form>
+        </div>
+
+        <!-- Modal Footer with Generate and Cancel Buttons -->
+        <div class="simple-modal-footer">
+            <button class="icon-text" type="submit" form="gcForm" id="generateCheckBtn">
+                <span class="material-icons">check_circle</span>Generate
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Check Help Modal -->
+<div class="simple-modal-overlay" id="checkHelpOverlay">
+    <div class="simple-modal-container" style="width: 1100px; height: 90vh;">
+
+        <!-- Modal Header -->
+        <div class="simple-modal-header">
+            <div class="simple-modal-title">Help</div>
+            <button class="close" id="closeCheckHelpModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="simple-modal-body" style="overflow-y: auto;">
+            <article id="checkHelpContent" class="markdown-body">
+                Loading documentation…
+            </article>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

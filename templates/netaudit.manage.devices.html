@@ -1,0 +1,67 @@
+{% extends "netaudit.manage.html" %}
+
+{% block modals %}
+
+<!-- Include current user and external JavaScript file -->
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.devices.js') }}"></script>
+
+<div class="simple-modal-overlay" id="modalOverlay">
+    <div class="simple-modal-container" style="width: 600px;">
+
+        <!-- Modal Header -->
+        <div class="simple-modal-header">
+            <div class="simple-modal-title" id="modalTitle">Add Device(s)</div>
+            <button class="close" type="button" id="closeModalBtn">
+                <span class="material-icons">close</span>
+            </button>
+
+        </div>
+
+        <!-- Modal Body -->
+        <div class="simple-modal-body">
+            <form class="form-grid" id="modalForm" style="grid-template-columns: max-content 1fr auto;">
+
+                <label for="deviceHostnames">Hostname/IP</label>
+                <input type="text" id="deviceHostnames" placeholder="Enter comma-separated hostnames or IPs" required/>
+                <span></span>
+
+                <label>View(s)</label>
+                <div class="multiselect">
+                    <div class="multiselect-toggle" id="viewDropdownToggle">
+                        <span id="selectedViewsText">Select view(s)</span>
+                        <span class="material-icons" style="font-size:18px; padding:0; margin:0;">keyboard_arrow_down</span>
+                    </div>
+                    <div class="multiselect-menu" id="viewDropdownMenu">
+                        {% for view_name in view_list %}
+                        <label class="multiselect-item">
+                            <input type="checkbox" value="{{ view_name }}">
+                            {{ view_name }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <span></span>
+
+                <label for="deviceConnector">Connector</label>
+                    <select id="deviceConnector">
+                        <option value="">Not Set</option>
+                        {% for connector_name in connectors %}
+                        <option value="{{ connector_name }}">{{ connector_name }}</option>
+                        {% endfor %}
+                    </select>
+                <span></span>
+
+            </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="simple-modal-footer">
+            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
+                <span class="material-icons">save</span>Save
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

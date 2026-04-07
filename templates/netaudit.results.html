@@ -1,0 +1,160 @@
+{% extends "netaudit.html" %}
+
+{% block main %}
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.results.view.js') }}"></script>
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.results.js') }}"></script>
+<script src="{{ url_for('static', filename='js/atx.utils.js') }}"></script>
+<script>
+    const STATUS_CODES = {{ status_codes|tojson }};
+</script>
+
+<div class="results-layout">
+
+    <div class="results-main-content">
+        <div class="page-header">
+            <div class="breadcrumb">
+                {% for crumb in breadcrumbs %}
+                {% if not loop.last %}
+                <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                <span class="sep">></span>
+                {% else %}
+                <span class="current">{{ crumb.title }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            {% block action_buttons %}
+            <div class="actions">
+                <button class="icon-text" id="runAuditBtn" style="display: none;">
+                    <span class="material-icons">play_arrow</span> Run Audit
+                </button>
+                <button class="icon-text" id="followupBtn" style="display: none;">
+                    <span class="material-icons">edit</span> Follow Up
+                </button>
+                <button class="icon-text" id="exportAuditBtn" style="display: none;">
+                    <span class="material-icons">archive</span> Export
+                </button>
+
+                <div class="views-panel-wrapper">
+                    <button class="icon-text dropdown-toggle" id="viewsBtn">
+                        <span class="material-icons view-icon">view_list</span>
+                        <span class="label">Views</span>
+                        <span class="material-icons toggle-icon" style="margin-left:auto">chevron_left</span>
+                    </button>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+
+        <table class="display" id="resultsDatatable" style="width: 100%">
+            <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" disabled>
+                </th>
+                <th>Hostname</th>
+                <th>Overall</th>
+                <th>Action Taken</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
+                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
+                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Right Dock Panel -->
+    <div id="viewsDockPanel" class="views-dock-panel">
+
+        <div class="views-panel-search">
+            <input
+                    type="text"
+                    id="viewFilterInput"
+                    placeholder="Filter views..."
+            >
+        </div>
+        <div class="views-panel-list" id="viewsMenu">
+            {% for view in views %}
+            <div class="dock-item" data-view="{{ view.name }}">
+                <span class="material-icons">{{ view.icon }}</span>
+                <span class="view-name">{{ view.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Follow Up -->
+<div id="modalOverlay" class="simple-modal-overlay">
+    <div class="simple-modal-container" style="width: 800px;">
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title">Follow Up</h5>
+            <button id="closeModalBtn" class="close">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="simple-modal-body">
+            <form class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+                <label for="userActionSelect">User Action</label>
+                <select id="userActionSelect" style="width: 30%;">
+                    {% for action in std_user_actions %}
+                    <option>
+                        <div>{{ action }}</div>
+                    </option>
+                    {% endfor %}
+                </select>
+                <span></span>
+
+                <label for="userComment">Comments</label>
+                <textarea id="userComment" style="height:300px;resize:none;"
+                          placeholder="Add your notes..."></textarea>
+                <span></span>
+            </form>
+        </div>
+        <div class="simple-modal-footer">
+            <button id="saveBtn" class="icon-text">
+                <span class="material-icons button">save</span> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Run Modal -->
+<div class="simple-modal-overlay" id="runModal">
+    <div class="simple-modal-container" style="width: 600px;">
+
+        <div class="simple-modal-header">
+            <div class="simple-modal-title">Run</div>
+            <button class="close" id="closeRunModal">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="simple-modal-body">
+            <form id="runModalForm">
+                <div class="form-group-row">
+                    <label>Connector</label>
+                    <select id="runModalConnectors" required>
+                        <option value="">-- Select Connector --</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="simple-modal-footer">
+            <button type="submit" form="runModalForm" id="confirmRunModal" class="icon-text">
+                <span class="material-icons">play_arrow</span> Run
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

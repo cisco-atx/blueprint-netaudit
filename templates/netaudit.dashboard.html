@@ -1,0 +1,151 @@
+{% extends "netaudit.html" %}
+
+{% block main %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.dashboard.js') }}"></script>
+<script>
+    const donutData = {{ donut_data | tojson }};
+    const timelineData = {{ timeline_data | tojson }};
+</script>
+
+<!-- Breadcrumb Navigation -->
+<div class="page-header">
+    <div class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+        {% if not loop.last %}
+        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+        <span class="sep">></span>
+        {% else %}
+        <span class="current">{{ crumb.title }}</span>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="dashboard-content">
+
+    <!-- Top Row: Summary Cards -->
+    <div class="row-tables">
+
+        <!-- Devices Summary Card -->
+        <div class="card">
+            <div class="card-header">
+                <span class="material-icons" style="font-weight:400;">devices</span>Devices
+            </div>
+            <div class="card-body">
+                <table class="info-table">
+                    <tr>
+                        <td style="padding: 4px;">
+                            <div style="display: flex; align-items:center; gap:8px;">
+                                <span class="material-icons filled text-primary"
+                                      style="font-size:19px;">database</span>
+                                Total
+                            </div>
+                        </td>
+                        <td class="value">{{ devices.total_devices }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px;">
+                            <div style="display: flex; align-items:center; gap:8px;">
+                                <span class="material-icons filled text-success" style="font-size:19px;">check_circle</span>
+                                Passed
+                            </div>
+                        </td>
+                        <td class="value">{{ devices.passed_devices }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px;">
+                            <div style="display: flex; align-items:center; gap:8px;">
+                                <span class="material-icons filled text-danger" style="font-size:19px;">error</span>
+                                Failed
+                            </div>
+                        </td>
+                        <td class="value">{{ devices.failed_devices }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px;">
+                            <div style="display: flex; align-items:center; gap:8px;">
+                                <span class="material-icons filled text-secondary"
+                                      style="font-size:19px;">help</span>
+                                Unknown
+                            </div>
+                        </td>
+                        <td class="value">{{ devices.unknown_devices }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Taken Summary Card -->
+        <div class="card">
+            <div class="card-header">
+                <span class="material-icons" style="font-weight:400;">history</span> Action Taken
+            </div>
+            <div class="card-body">
+                <table class="info-table">
+                    {% for action, action_data in user_actions.items() %}
+                    <tr>
+                        <td style="padding: 4px;">
+                            <div style="display: flex; align-items:center; gap:8px;">
+                                <span class="material-icons filled text-{{ action_data['color'] }}"
+                                      style="font-size:19px;">{{ action_data['icon'] }}</span>
+                                {{ action }}
+                            </div>
+                        </td>
+                        <td class="value">{{ action_data['count'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <!-- Views Summary Card -->
+        <div class="card">
+            <div class="card-header">
+                <span class="material-icons" style="font-weight:400;">checklist</span> Views (Checks)
+            </div>
+            <div class="card-body scrollable">
+                <table class="info-table">
+                    {% for view, view_data in views.items() %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-icons"  style="font-size:19px;">{{ view_data['icon'] }}</span> {{ view }}
+                            </div>
+                        </td>
+                        <td class="value">{{ view_data['checks'] | length }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Row: Charts -->
+    <div class="row-charts">
+
+        <!-- Donut Chart: Audit by View -->
+        <div class="card small">
+            <div class="card-header">
+                <span class="material-icons" style="font-weight:400;">pie_chart</span> Audit by View
+            </div>
+            <div class="card-body">
+                <canvas id="donutChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Timeline Chart: Device Deployment -->
+        <div class="card large">
+            <div class="card-header">
+                <span class="material-icons" style="font-weight:400;">timeline</span>Device Deployed
+            </div>
+            <div class="card-body">
+                <canvas id="timelineChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

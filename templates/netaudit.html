@@ -1,0 +1,37 @@
+{% extends "atx.home.html" %}
+
+{% block sidebar %}
+
+<link rel="stylesheet" id="theme-stylesheet" href="{{ url_for('netaudit.static', filename='css/common.css') }}">
+
+<div class="menu-item" data-href="{{ url_for('netaudit.render_dashboard') }}">
+    <span class="material-icons">dashboard</span>
+    <span>Dashboard</span>
+</div>
+<div class="menu-item" data-href="{{ url_for('netaudit.render_results_for_views') }}">
+    <span class="material-icons">layers</span>
+    <span>Results</span>
+</div>
+<div class="menu-item" data-href="{{ url_for('netaudit.render_quickaudit') }}">
+    <span class="material-icons">bolt</span>
+    <span>Quick Audit</span>
+</div>
+<hr class="admin-only" style="margin-top: 6px; margin-bottom: 6px;">
+<div class="menu-item admin-only" data-href="{{ url_for('netaudit.render_manage_views') }}">
+    <span class="material-icons">view_list</span>
+    <span>Views</span>
+</div>
+<div class="menu-item admin-only" data-href="{{ url_for('netaudit.render_manage_devices') }}">
+    <span class="material-icons">devices</span>
+    <span>Devices</span>
+</div>
+<div class="menu-item admin-only" data-href="{{ url_for('netaudit.render_manage_checks') }}">
+    <span class="material-icons">checklist</span>
+    <span>Checks</span>
+</div>
+<div class="menu-item admin-only" data-href="{{ url_for('netaudit.render_manage_connectors') }}">
+    <span class="material-icons">account_tree</span>
+    <span>Connectors</span>
+</div>
+
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "netaudit.html" %}
+
+{% block main %}
+
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.quickaudit.js') }}"></script>
+<script src="{{ url_for('static', filename='js/atx.utils.js') }}"></script>
+
+<script>
+    const statusCodes = {{ status_codes | tojson }};
+</script>
+
+<!-- Breadcrumb Navigation -->
+<div class="page-header">
+    <div class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+        {% if not loop.last %}
+        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+        <span class="sep">></span>
+        {% else %}
+        <span class="current">{{ crumb.title }}</span>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% block action_buttons %}
+    <div class="actions">
+        <button class="icon-text" id="runAuditBtn">
+            <span class="material-icons">play_arrow</span> Run Audit
+        </button>
+        <button class="icon-text" id="viewReportBtn">
+            <span class="material-icons">table_chart</span> View Report
+        </button>
+
+    </div>
+    {% endblock %}
+</div>
+
+<div class="quickaudit-container">
+
+    <!-- Device List Input Section -->
+    <div class="column">
+        <h4>Device List</h4>
+        <textarea id="device-list" style="flex:1; resize:none; line-height:2;"
+                  placeholder="Enter one hostname per line..."></textarea>
+    </div>
+
+    <!-- Audit Checks Section -->
+    <div class="column">
+        <h4>Audit Checks</h4>
+        <div style="display: flex; gap: 6px; align-items: center;">
+            <div style="padding: 8px;">
+                <input type="checkbox" id="selectAllChecks">
+            </div>
+            <div style="flex: 1;">
+                <input type="text" class="check-filter" placeholder="Filter checks..." style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="checks-list">
+            {% for check, check_data in checks.items() %}
+            <div class="check-item">
+                <input type="checkbox" class="individual-check" value="{{ check }}">
+                <div>
+                    <span style="font-weight: 600;">{{ check_data.name }}</span> - {{ check_data.description }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Audit Report Modal -->
+<div class="simple-modal-overlay" id="viewReportModal">
+    <div class="simple-modal-container" style="width: 90%; height: 90%;">
+        <div class="simple-modal-header">
+            <h5 class="simple-modal-title">Audit Report</h5>
+            <div class="actions" style="margin-left:auto;">
+                <button class="close" id="exportExcelBtn">
+                    <span class="material-icons">file_download</span>
+                </button>
+                <button class="close" id="closeModalBtn">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="simple-modal-body">
+            <!-- Audit Report Table -->
+            <div class="report-section" style="margin-top:20px;">
+                <table id="auditReport" class="display" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>Overall</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="simple-modal-tooltip" id="checkDetailTooltip"></div>
+
+<!-- Run Modal -->
+<div class="simple-modal-overlay" id="runModal">
+    <div class="simple-modal-container" style="width: 600px;">
+
+        <div class="simple-modal-header">
+            <div class="simple-modal-title">Run</div>
+            <button class="close" id="closeRunModal">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="simple-modal-body">
+            <form id="runModalForm">
+                <div class="form-group-row">
+                    <label>Connector</label>
+                    <select id="runModalConnectors" required>
+                        <option value="">-- Select Connector --</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="simple-modal-footer">
+            <button type="submit" form="runModalForm" id="confirmRunModal" class="icon-text">
+                <span class="material-icons">play_arrow</span> Run
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

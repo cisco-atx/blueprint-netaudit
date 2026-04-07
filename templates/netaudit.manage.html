@@ -1,0 +1,116 @@
+{% extends "netaudit.html" %}
+
+{% block main %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/darcula.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- Include common JavaScript for management-related operations -->
+<script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.js') }}"></script>
+
+<!-- Header Row with Breadcrumbs and Action Buttons -->
+<div class="page-header">
+    <div class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+        {% if not loop.last %}
+        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+        <span class="sep">></span>
+        {% else %}
+        <span class="current">{{ crumb.title }}</span>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    {% block action_buttons %}
+    <div class="actions">
+        <button class="icon-text" id="deleteSelectedBtn" style="display:none;">
+            <span class="material-icons">delete_sweep</span>Delete Selected
+        </button>
+        <button class="icon-text" id="openModalBtn">
+            <span class="material-icons">{{ add_icon }}</span>{{ add_text }}
+        </button>
+    </div>
+    {% endblock %}
+</div>
+
+<!-- Data Table for Management -->
+<table class="display" id="manageDatatable" style="width:100%">
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        {% for col in columns %}
+        <th>{{ col }}</th>
+        {% endfor %}
+        <th>Actions</th>
+    </tr>
+
+    <tr>
+        <th></th>
+        {% for col in columns %}
+        <th>
+            <input type="text" class="col-filter" data-col="{{ loop.index0 }}" placeholder="Filter {{ col }}">
+        </th>
+        {% endfor %}
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <!-- Table Body Content -->
+    {% block table_body %}
+    {% for data_item in dataset %}
+    <tr>
+        <td><input type="checkbox" class="row-check" data-id="{{ data_item[columns[0]] }}"></td>
+        {% for col in columns %}
+        <td>{{ data_item[col] }}</td>
+        {% endfor %}
+        <td>
+            <div class="actions">
+                <button class="edit-btn icon-text">
+                    <span class="material-icons">edit_square</span>Edit
+                </button>
+                <button class="delete-btn icon-text">
+                    <span class="material-icons">delete</span>Delete
+                </button>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+    {% endblock %}
+    </tbody>
+</table>
+
+<!-- Delete Confirmation Modal -->
+<div class="simple-modal-overlay" id="deleteConfirmModal">
+    <div class="simple-modal-container">
+        <form>
+            <div class="simple-modal-header">
+                <div class="simple-modal-title">Confirm Delete</div>
+                <button class="close" id="closeDeleteModalBtn">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="simple-modal-body">
+                <p>Are you sure you want to delete the selected row(s)?</p>
+            </div>
+            <div class="simple-modal-footer">
+                <button class="icon-text" id="confirmDeleteBtn" type="button">
+                    <span class="material-icons">delete</span>Yes, Delete
+                </button>
+                <button class="icon-text" id="cancelDeleteBtn" type="button">
+                    <span class="material-icons">close</span>Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Placeholder for Additional Modals -->
+{% block modals %}{% endblock %}
+
+{% endblock %}
