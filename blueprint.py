@@ -10,8 +10,10 @@ class NetAudit(Blueprint):
         "name": "NetAudit",
         "description": "Network Auditing and Compliance",
         "version": "1.0.0",
-        "icon": "netaudit.ico"
+        "icon": "netaudit.ico",
+        "url_prefix": "/netaudit"
     }
+
 
     def __init__(self, **kwargs):
         super().__init__(
