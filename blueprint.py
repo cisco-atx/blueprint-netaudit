@@ -55,11 +55,11 @@ class NetAudit(Blueprint):
 
     def setup_db(self):
         """ Initializes the databases for views, devices, checks, facts, and results using SqliteDict, storing them in the designated database directory for the NetAudit blueprint. """
-        self.views_db = SqliteDict(os.path.join(self.DB_DIR, "views"), autocommit=True)
-        self.devices_db = SqliteDict(os.path.join(self.DB_DIR, "devices"), autocommit=True)
-        self.checks_db = SqliteDict(os.path.join(self.DB_DIR, "checks"), autocommit=True)
-        self.facts_db = SqliteDict(os.path.join(self.DB_DIR, "facts"), autocommit=True)
-        self.connectors_db = SqliteDict(os.path.join(self.DB_DIR, "connections"), autocommit=True)
+        self.views_db = SqliteDict(os.path.join(self.DB_DIR, "views.sqlite"), autocommit=True)
+        self.devices_db = SqliteDict(os.path.join(self.DB_DIR, "devices.sqlite"), autocommit=True)
+        self.checks_db = SqliteDict(os.path.join(self.DB_DIR, "checks.sqlite"), autocommit=True)
+        self.facts_db = SqliteDict(os.path.join(self.DB_DIR, "facts.sqlite"), autocommit=True)
+        self.connectors_db = SqliteDict(os.path.join(self.DB_DIR, "connections.sqlite"), autocommit=True)
 
     def setup_routes(self):
         """ Registers the routes defined in the NetAudit blueprint's routes module, allowing the blueprint to handle incoming requests according to the specified endpoints and methods. """

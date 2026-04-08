@@ -452,6 +452,7 @@ table thead .col-filter {
 .results-main-content {
   flex: 1;
   min-width: 0;
+  overflow-x: auto;
 }
 
 .views-dock-panel {

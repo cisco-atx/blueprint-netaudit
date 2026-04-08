@@ -156,7 +156,7 @@ def update_device_results_upon_view_change(view_devices):
 def get_device_results(device_id):
     """ Fetches the results for a specific device from its corresponding database and returns it as JSON. """
     netaudit_bp = current_app.blueprints.get("netaudit")
-    db_path = os.path.join(netaudit_bp.RESULTS_DIR, device_id)
+    db_path = os.path.join(netaudit_bp.RESULTS_DIR, f"{device_id}.sqlite")
     device_db = SqliteDict(db_path, autocommit=True)
     results = dict(device_db)
     device_db.close()
@@ -197,7 +197,7 @@ def save_followup():
 def save_device_results_util(device_id, data, clear_missing=False):
     """ Internal function to save device results by merging incoming data with existing data and updating the corresponding database. """
     netaudit_bp = current_app.blueprints.get("netaudit")
-    db_path = os.path.join(netaudit_bp.RESULTS_DIR, device_id)
+    db_path = os.path.join(netaudit_bp.RESULTS_DIR, f"{device_id}.sqlite")
     device_db = SqliteDict(db_path, autocommit=True)
 
     if not dict(device_db):
