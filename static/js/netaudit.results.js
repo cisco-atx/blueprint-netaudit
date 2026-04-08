@@ -76,6 +76,8 @@ $(document).ready(function () {
             btn.prop("disabled", false).html(originalHtml);
             if (window.loadAuditView && window.currentAuditView) {
                 window.loadAuditView(window.currentAuditView);
+            } else {
+                location.reload();
             }
 
         } catch (err) {
@@ -168,9 +170,10 @@ $(document).ready(function () {
             data: JSON.stringify({ devices: followUpDevices, user_action, user_comments }),
             success: () => {
                 closeFollowUpModal();
-
                 if (window.loadAuditView && window.currentAuditView) {
                     window.loadAuditView(window.currentAuditView);
+                } else {
+                    location.reload();
                 }
             },
             error: () => alert("Follow up save failed")

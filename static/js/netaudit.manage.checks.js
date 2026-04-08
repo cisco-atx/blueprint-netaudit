@@ -8,7 +8,6 @@ $(document).ready(function () {
     // Global Configuration
     window.datasetName = "checks";
 
-    // Just Execute request /netaudit/api/checks/scan
     fetch("/netaudit/api/checks/scan", { method: "POST" })
 
     // Initialize CodeMirror Editor for Check Code
@@ -188,7 +187,16 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify({ key: filename, data: code }),
             success: function () {
-                location.reload();
+                $.ajax({
+                    url: "/netaudit/api/checks/scan",
+                    method: "POST",
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        location.reload();
+                    }
+                });
             },
             error: function (err) {
                 alert("Save failed: " + (err.responseJSON?.error || "Unknown error"));
