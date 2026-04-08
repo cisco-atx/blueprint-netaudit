@@ -76,6 +76,8 @@ $(document).ready(function () {
             btn.prop("disabled", false).html(originalHtml);
             if (window.loadAuditView && window.currentAuditView) {
                 window.loadAuditView(window.currentAuditView);
+            } else {
+                location.reload();
             }
 
         } catch (err) {
