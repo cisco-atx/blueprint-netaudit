@@ -8,10 +8,7 @@ $(document).ready(function () {
     // Global Configuration
     window.datasetName = "checks";
 
-<<<<<<< HEAD
-=======
     // Initial scan to populate checks data and ensure latest checks are loaded
->>>>>>> aad577ad87aee8cfbd6ce212d6efa5565af7a1c2
     fetch("/netaudit/api/checks/scan", { method: "POST" })
 
     // Initialize CodeMirror Editor for Check Code
