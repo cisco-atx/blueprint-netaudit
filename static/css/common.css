@@ -436,6 +436,7 @@ table thead .col-filter {
 }
 
 [data-theme="dark"] .badge.status-inconclusive {
+  background-color: #2b1a3a;
   color: #a78bfa;
   box-shadow: 0 0 6px rgba(167, 139, 250, 0.4);
 }
