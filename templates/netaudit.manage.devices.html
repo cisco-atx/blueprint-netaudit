@@ -2,35 +2,68 @@
 
 {% block modals %}
 
-<!-- Include current user and external JavaScript file -->
+<!-- External JavaScript for device management functionality -->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.devices.js') }}"></script>
 
+<!-- Modal Overlay -->
 <div class="simple-modal-overlay" id="modalOverlay">
+
+    <!-- Modal Container -->
     <div class="simple-modal-container" style="width: 600px;">
 
-        <!-- Modal Header -->
-        <div class="simple-modal-header">
-            <div class="simple-modal-title" id="modalTitle">Add Device(s)</div>
+        <!-- ===================== -->
+        <!-- Modal Header Section -->
+        <!-- ===================== -->
+        <header class="simple-modal-header">
+            <!-- Modal Title -->
+            <div class="simple-modal-title" id="modalTitle">
+                Add Device(s)
+            </div>
+
+            <!-- Close Button -->
             <button class="close" type="button" id="closeModalBtn">
                 <span class="material-icons">close</span>
             </button>
+        </header>
 
-        </div>
+        <!-- ===================== -->
+        <!-- Modal Body Section -->
+        <!-- ===================== -->
+        <section class="simple-modal-body">
 
-        <!-- Modal Body -->
-        <div class="simple-modal-body">
-            <form class="form-grid" id="modalForm" style="grid-template-columns: max-content 1fr auto;">
+            <!-- Device Form -->
+            <form
+                    class="form-grid"
+                    id="modalForm"
+                    style="grid-template-columns: max-content 1fr auto;"
+            >
 
+                <!-- Hostname/IP Input -->
                 <label for="deviceHostnames">Hostname/IP</label>
-                <input type="text" id="deviceHostnames" placeholder="Enter comma-separated hostnames or IPs" required/>
+                <input
+                        type="text"
+                        id="deviceHostnames"
+                        placeholder="Enter comma-separated hostnames or IPs"
+                        required
+                />
                 <span></span>
 
+                <!-- Views Multi-select Dropdown -->
                 <label>View(s)</label>
                 <div class="multiselect">
+
+                    <!-- Dropdown Toggle -->
                     <div class="multiselect-toggle" id="viewDropdownToggle">
                         <span id="selectedViewsText">Select view(s)</span>
-                        <span class="material-icons" style="font-size:18px; padding:0; margin:0;">keyboard_arrow_down</span>
+                        <span
+                                class="material-icons"
+                                style="font-size:18px; padding:0; margin:0;"
+                        >
+                keyboard_arrow_down
+              </span>
                     </div>
+
+                    <!-- Dropdown Menu -->
                     <div class="multiselect-menu" id="viewDropdownMenu">
                         {% for view_name in view_list %}
                         <label class="multiselect-item">
@@ -39,27 +72,42 @@
                         </label>
                         {% endfor %}
                     </div>
+
                 </div>
                 <span></span>
 
+                <!-- Connector Selection -->
                 <label for="deviceConnector">Connector</label>
-                    <select id="deviceConnector">
-                        <option value="">Not Set</option>
-                        {% for connector_name in connectors %}
-                        <option value="{{ connector_name }}">{{ connector_name }}</option>
-                        {% endfor %}
-                    </select>
+                <select id="deviceConnector">
+                    <option value="">Not Set</option>
+                    {% for connector_name in connectors %}
+                    <option value="{{ connector_name }}">
+                        {{ connector_name }}
+                    </option>
+                    {% endfor %}
+                </select>
                 <span></span>
 
             </form>
-        </div>
+        </section>
 
-        <!-- Modal Footer -->
-        <div class="simple-modal-footer">
-            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
-                <span class="material-icons">save</span>Save
+        <!-- ===================== -->
+        <!-- Modal Footer Section -->
+        <!-- ===================== -->
+        <footer class="simple-modal-footer">
+
+            <!-- Save Button -->
+            <button
+                    class="icon-text"
+                    id="saveBtn"
+                    type="submit"
+                    form="modalForm"
+            >
+                <span class="material-icons">save</span>
+                Save
             </button>
-        </div>
+
+        </footer>
 
     </div>
 </div>

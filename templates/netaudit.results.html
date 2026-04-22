@@ -1,18 +1,28 @@
 {% extends "netaudit.html" %}
 
 {% block main %}
+
+<!-- ===================== Scripts ===================== -->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.results.view.js') }}"></script>
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.results.js') }}"></script>
 <script src="{{ url_for('static', filename='js/atx.utils.js') }}"></script>
+
+<!-- Inject backend status codes into frontend -->
 <script>
     const STATUS_CODES = {{ status_codes|tojson }};
 </script>
 
+<!-- ===================== Main Layout ===================== -->
 <div class="results-layout">
 
+    <!-- ===================== Main Content ===================== -->
     <div class="results-main-content">
-        <div class="page-header">
-            <div class="breadcrumb">
+
+        <!-- ===== Page Header ===== -->
+        <header class="page-header">
+
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb">
                 {% for crumb in breadcrumbs %}
                 {% if not loop.last %}
                 <a href="{{ crumb.url }}">{{ crumb.title }}</a>
@@ -21,20 +31,31 @@
                 <span class="current">{{ crumb.title }}</span>
                 {% endif %}
                 {% endfor %}
-            </div>
+            </nav>
 
+            <!-- Action Buttons -->
             {% block action_buttons %}
             <div class="actions">
+
+                <!-- Run Audit Button -->
                 <button class="icon-text" id="runAuditBtn" style="display: none;">
-                    <span class="material-icons">play_arrow</span> Run Audit
-                </button>
-                <button class="icon-text" id="followupBtn" style="display: none;">
-                    <span class="material-icons">edit</span> Follow Up
-                </button>
-                <button class="icon-text" id="exportAuditBtn" style="display: none;">
-                    <span class="material-icons">archive</span> Export
+                    <span class="material-icons">play_arrow</span>
+                    Run Audit
                 </button>
 
+                <!-- Follow Up Button -->
+                <button class="icon-text" id="followupBtn" style="display: none;">
+                    <span class="material-icons">edit</span>
+                    Follow Up
+                </button>
+
+                <!-- Export Button -->
+                <button class="icon-text" id="exportAuditBtn" style="display: none;">
+                    <span class="material-icons">archive</span>
+                    Export
+                </button>
+
+                <!-- Views Dropdown Toggle -->
                 <div class="views-panel-wrapper">
                     <button class="icon-text dropdown-toggle" id="viewsBtn">
                         <span class="material-icons view-icon">view_list</span>
@@ -42,36 +63,55 @@
                         <span class="material-icons toggle-icon" style="margin-left:auto">chevron_left</span>
                     </button>
                 </div>
+
             </div>
             {% endblock %}
-        </div>
 
-        <table class="display" id="resultsDatatable" style="width: 100%">
-            <thead>
-            <tr>
-                <th>
-                    <input type="checkbox" id="selectAll" disabled>
-                </th>
-                <th>Hostname</th>
-                <th>Overall</th>
-                <th>Action Taken</th>
-            </tr>
-            <tr>
-                <th></th>
-                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
-                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
-                <th><input type="text" class="col-filter" disabled placeholder="Loading..."></th>
-            </tr>
-            </thead>
-            <tbody>
+        </header>
 
-            </tbody>
-        </table>
+        <!-- ===== Results Table ===== -->
+        <section>
+            <table class="display" id="resultsDatatable" style="width: 100%;">
+
+                <!-- Table Header -->
+                <thead>
+                <!-- Column Titles -->
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selectAll" disabled>
+                    </th>
+                    <th>Hostname</th>
+                    <th>Overall</th>
+                    <th>Action Taken</th>
+                </tr>
+
+                <!-- Column Filters -->
+                <tr>
+                    <th></th>
+                    <th>
+                        <input type="text" class="col-filter" disabled placeholder="Loading...">
+                    </th>
+                    <th>
+                        <input type="text" class="col-filter" disabled placeholder="Loading...">
+                    </th>
+                    <th>
+                        <input type="text" class="col-filter" disabled placeholder="Loading...">
+                    </th>
+                </tr>
+                </thead>
+
+                <!-- Table Body (Populated Dynamically) -->
+                <tbody></tbody>
+
+            </table>
+        </section>
+
     </div>
 
-    <!-- Right Dock Panel -->
-    <div id="viewsDockPanel" class="views-dock-panel">
+    <!-- ===================== Right Dock Panel ===================== -->
+    <aside id="viewsDockPanel" class="views-dock-panel">
 
+        <!-- View Search Input -->
         <div class="views-panel-search">
             <input
                     type="text"
@@ -79,6 +119,8 @@
                     placeholder="Filter views..."
             >
         </div>
+
+        <!-- Views List -->
         <div class="views-panel-list" id="viewsMenu">
             {% for view in views %}
             <div class="dock-item" data-view="{{ view.name }}">
@@ -87,21 +129,28 @@
             </div>
             {% endfor %}
         </div>
-    </div>
+
+    </aside>
+
 </div>
 
-
-<!-- Modal for Follow Up -->
+<!-- ===================== Follow Up Modal ===================== -->
 <div id="modalOverlay" class="simple-modal-overlay">
     <div class="simple-modal-container" style="width: 800px;">
+
+        <!-- Modal Header -->
         <div class="simple-modal-header">
             <h5 class="simple-modal-title">Follow Up</h5>
             <button id="closeModalBtn" class="close">
                 <span class="material-icons">close</span>
             </button>
         </div>
+
+        <!-- Modal Body -->
         <div class="simple-modal-body">
             <form class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+
+                <!-- User Action Selection -->
                 <label for="userActionSelect">User Action</label>
                 <select id="userActionSelect" style="width: 30%;">
                     {% for action in std_user_actions %}
@@ -112,25 +161,34 @@
                 </select>
                 <span></span>
 
+                <!-- User Comments -->
                 <label for="userComment">Comments</label>
-                <textarea id="userComment" style="height:300px;resize:none;"
-                          placeholder="Add your notes..."></textarea>
+                <textarea
+                        id="userComment"
+                        style="height:300px;resize:none;"
+                        placeholder="Add your notes..."
+                ></textarea>
                 <span></span>
+
             </form>
         </div>
+
+        <!-- Modal Footer -->
         <div class="simple-modal-footer">
             <button id="saveBtn" class="icon-text">
-                <span class="material-icons button">save</span> Save
+                <span class="material-icons button">save</span>
+                Save
             </button>
         </div>
+
     </div>
 </div>
 
-
-<!-- Run Modal -->
+<!-- ===================== Run Modal ===================== -->
 <div class="simple-modal-overlay" id="runModal">
     <div class="simple-modal-container" style="width: 600px;">
 
+        <!-- Modal Header -->
         <div class="simple-modal-header">
             <div class="simple-modal-title">Run</div>
             <button class="close" id="closeRunModal">
@@ -138,22 +196,34 @@
             </button>
         </div>
 
+        <!-- Modal Body -->
         <div class="simple-modal-body">
             <form id="runModalForm">
+
+                <!-- Connector Selection -->
                 <div class="form-group-row">
                     <label>Connector</label>
                     <select id="runModalConnectors" required>
                         <option value="">-- Select Connector --</option>
                     </select>
                 </div>
+
             </form>
         </div>
 
+        <!-- Modal Footer -->
         <div class="simple-modal-footer">
-            <button type="submit" form="runModalForm" id="confirmRunModal" class="icon-text">
-                <span class="material-icons">play_arrow</span> Run
+            <button
+                    type="submit"
+                    form="runModalForm"
+                    id="confirmRunModal"
+                    class="icon-text"
+            >
+                <span class="material-icons">play_arrow</span>
+                Run
             </button>
         </div>
+
     </div>
 </div>
 

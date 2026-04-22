@@ -2,21 +2,27 @@
 <html>
 <head>
     <meta charset="utf-8">
+
+    <!-- External Stylesheets -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet">
 
+    <!-- Embedded Local CSS (Optional) -->
     {% if embed_local_assets %}
     <style>
         {{ get_static_file("css/common.css") | safe }}
     </style>
     {% endif %}
 
+    <!-- Custom Styles -->
     <style>
-        /* badge */
+        /* Badge Component */
         .badge {
           border-radius: 4px;
           color: white;
@@ -35,140 +41,187 @@
           margin-right: 3px;
         }
 
-        pre, code, textarea {
-            font-family: 'Google Sans Mono', 'Courier New', Courier, monospace;
-            font-size: 12px;
-            line-height: 1.4;
+        /* Monospace formatting for code-like elements */
+        pre,
+        code,
+        textarea {
+          font-family: 'Google Sans Mono', 'Courier New', Courier, monospace;
+          font-size: 12px;
+          line-height: 1.4;
         }
     </style>
 
+    <!-- External Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
+    <!-- Embedded Local JS (Optional) -->
     {% if embed_local_assets %}
     <script>
         {{ get_static_file("js/netaudit.results.device.js") | safe }}
     </script>
     {% endif %}
-
 </head>
+
 {% set status_icon_map = {
-    0: "fa-circle-minus",
-    1: "fa-check-circle",
-    2: "fa-xmark-circle",
-    3: "fa-triangle-exclamation",
-    4: "fa-info-circle",
-    5: "fa-bug",
-    6: "fa-question-circle"
+0: "fa-circle-minus",
+1: "fa-check-circle",
+2: "fa-xmark-circle",
+3: "fa-triangle-exclamation",
+4: "fa-info-circle",
+5: "fa-bug",
+6: "fa-question-circle"
 } %}
+
 <body style="overflow: auto;">
-<div style="
-        padding: 4px;
-        border-bottom: 1px solid #ddd;
-        font-size: 12px;
-        background-color: #f9f9f9;
-        display: flex;
-        justify-content: space-between;
-        ">
+
+<!-- Header / Report Metadata -->
+<header
+        style="
+      padding: 4px;
+      border-bottom: 1px solid #ddd;
+      font-size: 12px;
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: space-between;
+    "
+>
     <span>{{ report_filename }}</span>
     <span>Generated on {{ generated_at.strftime('%d %b %Y %H:%M') }}</span>
-</div>
-<div style="margin: 0 12px;">
-    <!-- Device Information Table -->
-    <h4 style="margin:10px 0;">Device</h4>
-    <div style="display: flex; flex-direction: row; gap: 20px;">
-        <table class="device-infotable">
-            <tbody>
-            <tr>
-                <th>Hostname</th>
-                <td>{{ device_data.hostname }}</td>
-            </tr>
-            {% for fact_name, fact_value in device_data.facts.items() %}
-            <tr>
-                <th>{{ fact_name }}</th>
-                <td>{{ fact_value }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-                <th>Date Added</th>
-                <td>{{ date_added }}</td>
-            </tr>
-            <tr>
-                <th>Last Audit</th>
-                <td>{{ last_audit }}</td>
-            </tr>
-            <tr>
-                <th>Login</th>
-                <td>
-                    {% if device_data.login is true %}
-                    <span class="badge status-pass">SUCCESS</span>
-                    {% elif device_data.login is false %}
-                    <span class="badge status-fail">FAILED</span>
-                    {% else %}
-                    <span class="badge status-notrun">UNKNOWN</span>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Overall</th>
-                <td class="text-center">
-                    {% set status = status_codes.get(device_data.status) %}
-                    <span class="badge status-{{ status.label | lower | replace(' ', '') }}"
-                          title="{{ status.description }}">
-                            <i class="fa {{ status_icon_map.get(device_data.status) }}"></i>
-                            <span>{{ status.label }}</span>
-                    </span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+</header>
 
-    <!-- Audit Results Table -->
-    <h4 style="margin-bottom: 10px;">Audit</h4>
-    <table id="deviceResultstable" class="display" style="width: 100%;">
-        <thead>
-        <tr>
-            {% for col in columns %}
-            <th>{{ col }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for data_item in dataset %}
-        <tr>
-            {% for col in columns %}
-            {% if col == "Status" %}
-            <td>
-                {% set status = status_codes.get(data_item[col], status_codes[0]) %}
-                <span class="badge status-{{ status.label | lower | replace(' ', '')  }}"
-                      title="{{ status.description }}">
+<!-- Main Content Container -->
+<main style="margin: 0 12px;">
+
+    <!-- Device Information Section -->
+    <section>
+        <h4 style="margin: 10px 0;">Device</h4>
+
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+            <table class="device-infotable">
+                <tbody>
+                <tr>
+                    <th>Hostname</th>
+                    <td>{{ device_data.hostname }}</td>
+                </tr>
+
+                <!-- Dynamic Device Facts -->
+                {% for fact_name, fact_value in device_data.facts.items() %}
+                <tr>
+                    <th>{{ fact_name }}</th>
+                    <td>{{ fact_value }}</td>
+                </tr>
+                {% endfor %}
+
+                <tr>
+                    <th>Date Added</th>
+                    <td>{{ date_added }}</td>
+                </tr>
+
+                <tr>
+                    <th>Last Audit</th>
+                    <td>{{ last_audit }}</td>
+                </tr>
+
+                <!-- Login Status -->
+                <tr>
+                    <th>Login</th>
+                    <td>
+                        {% if device_data.login is true %}
+                        <span class="badge status-pass">SUCCESS</span>
+                        {% elif device_data.login is false %}
+                        <span class="badge status-fail">FAILED</span>
+                        {% else %}
+                        <span class="badge status-notrun">UNKNOWN</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <!-- Overall Device Status -->
+                <tr>
+                    <th>Overall</th>
+                    <td class="text-center">
+                        {% set status = status_codes.get(device_data.status) %}
+                        <span
+                                class="badge status-{{ status.label | lower | replace(' ', '') }}"
+                                title="{{ status.description }}"
+                        >
+                  <i class="fa {{ status_icon_map.get(device_data.status) }}"></i>
+                  <span>{{ status.label }}</span>
+                </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Audit Results Section -->
+    <section>
+        <h4 style="margin-bottom: 10px;">Audit</h4>
+
+        <table id="deviceResultstable" class="display" style="width: 100%;">
+            <thead>
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for data_item in dataset %}
+            <tr>
+                {% for col in columns %}
+                {% if col == "Status" %}
+                <td>
+                    {% set status = status_codes.get(data_item[col], status_codes[0]) %}
+                    <span
+                            class="badge status-{{ status.label | lower | replace(' ', '') }}"
+                            title="{{ status.description }}"
+                    >
                 <i class="fa {{ status_icon_map.get(data_item[col]) }}"></i>
                 <span>{{ status.label }}</span>
-            </span>
-            </td>
-            {% else %}
-            <td style="white-space: pre-wrap;">{{ data_item[col] | safe }}</td>
-            {% endif %}
+              </span>
+                </td>
+                {% else %}
+                <td style="white-space: pre-wrap;">{{ data_item[col] | safe }}</td>
+                {% endif %}
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </section>
 
-    <h4 style="margin: 14px 0 10px 0;">Logs</h4>
-    <div>
-        {% for cmd, output in device_data.raw.items() %}
-        {% set cmd_parts = cmd.split(':') %}
-        {% if cmd_parts[0] == device_id %}
-        <h4 style="margin: 0 8px; padding:0; font-size: 11.8px;">{{ cmd_parts[1] }}</h4>
-        {% else %}
-        <h4 style="margin: 0 8px; padding:0; font-size: 11.8px;">{{ cmd }}</h4>
-        {% endif %}
-        <pre>{{ output }}</pre>
-        <hr style="margin:0 0 8px 0">
-        {% endfor %}
-    </div>
-</div>
+    <!-- Logs Section -->
+    <section>
+        <h4 style="margin: 14px 0 10px 0;">Logs</h4>
+
+        <div>
+            {% for cmd, output in device_data.raw.items() %}
+            {% set cmd_parts = cmd.split(':') %}
+
+            <!-- Command Title -->
+            {% if cmd_parts[0] == device_id %}
+            <h4 style="margin: 0 8px; padding: 0; font-size: 11.8px;">
+                {{ cmd_parts[1] }}
+            </h4>
+            {% else %}
+            <h4 style="margin: 0 8px; padding: 0; font-size: 11.8px;">
+                {{ cmd }}
+            </h4>
+            {% endif %}
+
+            <!-- Command Output -->
+            <pre>{{ output }}</pre>
+
+            <!-- Separator -->
+            <hr style="margin: 0 0 8px 0">
+            {% endfor %}
+        </div>
+    </section>
+
+</main>
 </body>
 </html>

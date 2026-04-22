@@ -1,42 +1,74 @@
 {% extends "netaudit.manage.html" %}
 
 {% block table_body %}
-<!-- Table Content Rendering -->
+<!-- ===================================================== -->
+<!-- Table Content Rendering Script -->
+<!-- ===================================================== -->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.views.js') }}"></script>
 
+<!-- ===================================================== -->
+<!-- Dynamic Table Rows -->
+<!-- Iterates over dataset to render each row -->
+<!-- ===================================================== -->
 {% for data_item in dataset %}
 <tr>
+    <!-- Row Selection Checkbox -->
     <td>
-        <input type="checkbox" class="row-check" data-id="{{ data_item[columns[0]] }}">
+        <input
+                type="checkbox"
+                class="row-check"
+                data-id="{{ data_item[columns[0]] }}"
+        >
     </td>
 
+    <!-- ================================================= -->
+    <!-- Dynamic Columns Rendering -->
+    <!-- Handles special cases for "Checks" and "Name" -->
+    <!-- ================================================= -->
     {% for col in columns %}
     {% if col == "Checks" %}
+    <!-- Checks Column: Render list of checks -->
     <td>
         {% for check in data_item[col] %}
         <div style="padding: 4px;">
-            <span style="font-weight: 600;">{{ check.name }}</span> - {{ check.description }}
+            <span style="font-weight: 600;">{{ check.name }}</span>
+            - {{ check.description }}
         </div>
         {% endfor %}
     </td>
+
     {% elif col == "Name" %}
+    <!-- Name Column: Render with icon -->
     <td>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-icons">{{ data_item['Icon'] }}</span>{{ data_item[col] }}
+            <span class="material-icons">{{ data_item['Icon'] }}</span>
+            {{ data_item[col] }}
         </div>
     </td>
+
     {% else %}
+    <!-- Default Column Rendering -->
     <td>{{ data_item[col] }}</td>
     {% endif %}
     {% endfor %}
 
+    <!-- ================================================= -->
+    <!-- Row Actions -->
+    <!-- Edit and Delete buttons -->
+    <!-- ================================================= -->
     <td>
         <div class="actions">
-            <button class="edit-btn icon-text" data-id="{{ data_item['Name'] }}">
-                <span class="material-icons">edit_square</span>Edit
+            <button
+                    class="edit-btn icon-text"
+                    data-id="{{ data_item['Name'] }}"
+            >
+                <span class="material-icons">edit_square</span>
+                Edit
             </button>
+
             <button class="delete-btn icon-text">
-                <span class="material-icons">delete</span>Delete
+                <span class="material-icons">delete</span>
+                Delete
             </button>
         </div>
     </td>
@@ -45,62 +77,124 @@
 {% endblock %}
 
 {% block modals %}
-<!-- Modal for Adding/Editing Views -->
+<!-- ===================================================== -->
+<!-- Modal Overlay for Add/Edit View -->
+<!-- ===================================================== -->
 <div class="simple-modal-overlay" id="modalOverlay">
     <div class="simple-modal-container" style="width: 1000px;">
+
+        <!-- Modal Header -->
         <div class="simple-modal-header">
-            <div class="simple-modal-title" id="modalTitle">Add View</div>
+            <div class="simple-modal-title" id="modalTitle">
+                Add View
+            </div>
             <button class="close" id="closeModalBtn">
                 <span class="material-icons">close</span>
             </button>
         </div>
 
+        <!-- Modal Body -->
         <div class="simple-modal-body">
             <form id="modalForm">
-                <div class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+
+                <!-- ============================================= -->
+                <!-- Form Grid: Name and Icon Selection -->
+                <!-- ============================================= -->
+                <div
+                        class="form-grid"
+                        style="grid-template-columns: max-content 1fr auto;"
+                >
+                    <!-- View Name -->
                     <label for="viewName">Name</label>
                     <input type="text" id="viewName" required>
                     <span></span>
 
+                    <!-- Icon Picker -->
                     <label for="viewIcon" style="width:50px">Icon</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                        <input type="text" id="viewIcon" placeholder="e.g. globe" style="flex-grow: 1;">
+                        <input
+                                type="text"
+                                id="viewIcon"
+                                placeholder="e.g. globe"
+                                style="flex-grow: 1;"
+                        >
+
+                        <!-- Icon Options -->
                         {% for icon in view_icons %}
-                        <button type="button" class="icon-only icon-picker" data-icon="{{ icon }}">
+                        <button
+                                type="button"
+                                class="icon-only icon-picker"
+                                data-icon="{{ icon }}"
+                        >
                             <span class="material-icons">{{ icon }}</span>
                         </button>
                         {% endfor %}
                     </div>
                 </div>
 
+                <!-- ============================================= -->
+                <!-- Dual Listbox for Managing Checks -->
+                <!-- ============================================= -->
                 <div class="dual-listbox">
+
+                    <!-- Available Checks -->
                     <div class="listbox-container">
                         <h4 style="margin:6px;">Available Checks</h4>
-                        <select id="availableChecks" multiple size="10" style="height: 500px;"></select>
+                        <select
+                                id="availableChecks"
+                                multiple
+                                size="10"
+                                style="height: 500px;"
+                        ></select>
                     </div>
 
+                    <!-- Listbox Control Buttons -->
                     <div class="listbox-buttons">
-                        <button id="moveRight" type="button" class="icon-only">
+                        <button
+                                id="moveRight"
+                                type="button"
+                                class="icon-only"
+                        >
                             <span class="material-icons">arrow_forward</span>
                         </button>
-                        <button id="moveLeft" type="button" class="icon-only">
+
+                        <button
+                                id="moveLeft"
+                                type="button"
+                                class="icon-only"
+                        >
                             <span class="material-icons">arrow_back</span>
                         </button>
                     </div>
 
+                    <!-- Selected Checks -->
                     <div class="listbox-container">
                         <h4 style="margin:6px;">Selected Checks</h4>
-                        <select id="selectedChecks" multiple size="10" style="height: 500px;"></select>
+                        <select
+                                id="selectedChecks"
+                                multiple
+                                size="10"
+                                style="height: 500px;"
+                        ></select>
                     </div>
+
                 </div>
             </form>
         </div>
 
+        <!-- Modal Footer -->
         <div class="simple-modal-footer">
-            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
-                <span class="material-icons">save</span>Save
+            <button
+                    class="icon-text"
+                    id="saveBtn"
+                    type="submit"
+                    form="modalForm"
+            >
+                <span class="material-icons">save</span>
+                Save
             </button>
         </div>
+
     </div>
 </div>
 {% endblock %}

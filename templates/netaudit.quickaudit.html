@@ -2,16 +2,22 @@
 
 {% block main %}
 
+<!-- External JavaScript Dependencies -->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.quickaudit.js') }}"></script>
 <script src="{{ url_for('static', filename='js/atx.utils.js') }}"></script>
 
+<!-- Injected Status Codes (from backend) -->
 <script>
     const statusCodes = {{ status_codes | tojson }};
 </script>
 
-<!-- Breadcrumb Navigation -->
-<div class="page-header">
-    <div class="breadcrumb">
+<!-- ===================================================== -->
+<!-- Page Header: Breadcrumbs + Action Buttons -->
+<!-- ===================================================== -->
+<header class="page-header">
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
         {% for crumb in breadcrumbs %}
         {% if not loop.last %}
         <a href="{{ crumb.url }}">{{ crumb.title }}</a>
@@ -20,60 +26,97 @@
         <span class="current">{{ crumb.title }}</span>
         {% endif %}
         {% endfor %}
-    </div>
+    </nav>
+
+    <!-- Action Buttons (Override-able Block) -->
     {% block action_buttons %}
     <div class="actions">
         <button class="icon-text" id="runAuditBtn">
-            <span class="material-icons">play_arrow</span> Run Audit
+            <span class="material-icons">play_arrow</span>
+            Run Audit
         </button>
         <button class="icon-text" id="viewReportBtn">
-            <span class="material-icons">table_chart</span> View Report
+            <span class="material-icons">table_chart</span>
+            View Report
         </button>
-
     </div>
     {% endblock %}
-</div>
 
-<div class="quickaudit-container">
+</header>
 
+<!-- ===================================================== -->
+<!-- Main Content: Quick Audit Container -->
+<!-- ===================================================== -->
+<main class="quickaudit-container">
+
+    <!-- ========================= -->
     <!-- Device List Input Section -->
-    <div class="column">
-        <h4 style="margin:2px;">Device List</h4>
-        <textarea id="device-list" style="flex:1; resize:none; line-height:2;"
-                  placeholder="Enter one hostname per line..."></textarea>
-    </div>
+    <!-- ========================= -->
+    <section class="column">
+        <h4 style="margin: 2px;">Device List</h4>
+        <textarea
+                id="device-list"
+                style="flex: 1; resize: none; line-height: 2;"
+                placeholder="Enter one hostname per line..."
+        ></textarea>
+    </section>
 
+    <!-- ========================= -->
     <!-- Audit Checks Section -->
-    <div class="column">
-        <h4 style="margin:2px;">Audit Checks</h4>
+    <!-- ========================= -->
+    <section class="column">
+        <h4 style="margin: 2px;">Audit Checks</h4>
+
+        <!-- Controls: Select All + Filter -->
         <div style="display: flex; gap: 6px; align-items: center;">
-            <div style="margin-left:13px;">
+            <div style="margin-left: 13px;">
                 <input type="checkbox" id="selectAllChecks">
             </div>
             <div style="flex: 1;">
-                <input type="text" class="check-filter" placeholder="Filter checks..." style="width: 100%;">
+                <input
+                        type="text"
+                        class="check-filter"
+                        placeholder="Filter checks..."
+                        style="width: 100%;"
+                >
             </div>
         </div>
 
+        <!-- Dynamic List of Audit Checks -->
         <div class="checks-list">
             {% for check, check_data in checks.items() %}
             <div class="check-item">
-                <input type="checkbox" class="individual-check" value="{{ check }}">
+                <input
+                        type="checkbox"
+                        class="individual-check"
+                        value="{{ check }}"
+                >
                 <div>
-                    <span style="font-weight: 600;">{{ check_data.name }}</span> - {{ check_data.description }}
+              <span style="font-weight: 600;">
+                {{ check_data.name }}
+              </span>
+                    - {{ check_data.description }}
                 </div>
             </div>
             {% endfor %}
         </div>
-    </div>
-</div>
 
-<!-- Audit Report Modal -->
+    </section>
+
+</main>
+
+<!-- ===================================================== -->
+<!-- Modal: Audit Report Viewer -->
+<!-- ===================================================== -->
 <div class="simple-modal-overlay" id="viewReportModal">
     <div class="simple-modal-container" style="width: 90%; height: 90%;">
+
+        <!-- Modal Header -->
         <div class="simple-modal-header">
             <h5 class="simple-modal-title">Audit Report</h5>
-            <div class="actions" style="margin-left:auto;">
+
+            <!-- Modal Actions -->
+            <div class="actions" style="margin-left: auto;">
                 <button class="close" id="exportExcelBtn">
                     <span class="material-icons">file_download</span>
                 </button>
@@ -83,10 +126,12 @@
             </div>
         </div>
 
+        <!-- Modal Body -->
         <div class="simple-modal-body">
+
             <!-- Audit Report Table -->
-            <div class="report-section" style="margin-top:20px;">
-                <table id="auditReport" class="display" style="width:100%">
+            <section class="report-section" style="margin-top: 20px;">
+                <table id="auditReport" class="display" style="width: 100%;">
                     <thead>
                     <tr>
                         <th>Device</th>
@@ -94,18 +139,25 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <!-- Populated dynamically -->
                     </tbody>
                 </table>
-            </div>
+            </section>
+
         </div>
     </div>
 </div>
+
+<!-- Tooltip for Check Details -->
 <div class="simple-modal-tooltip" id="checkDetailTooltip"></div>
 
-<!-- Run Modal -->
+<!-- ===================================================== -->
+<!-- Modal: Run Audit Configuration -->
+<!-- ===================================================== -->
 <div class="simple-modal-overlay" id="runModal">
     <div class="simple-modal-container" style="width: 600px;">
 
+        <!-- Modal Header -->
         <div class="simple-modal-header">
             <div class="simple-modal-title">Run</div>
             <button class="close" id="closeRunModal">
@@ -113,22 +165,34 @@
             </button>
         </div>
 
+        <!-- Modal Body -->
         <div class="simple-modal-body">
             <form id="runModalForm">
+
+                <!-- Connector Selection -->
                 <div class="form-group-row">
                     <label>Connector</label>
                     <select id="runModalConnectors" required>
                         <option value="">-- Select Connector --</option>
                     </select>
                 </div>
+
             </form>
         </div>
 
+        <!-- Modal Footer -->
         <div class="simple-modal-footer">
-            <button type="submit" form="runModalForm" id="confirmRunModal" class="icon-text">
-                <span class="material-icons">play_arrow</span> Run
+            <button
+                    type="submit"
+                    form="runModalForm"
+                    id="confirmRunModal"
+                    class="icon-text"
+            >
+                <span class="material-icons">play_arrow</span>
+                Run
             </button>
         </div>
+
     </div>
 </div>
 

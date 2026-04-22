@@ -6,6 +6,8 @@ Copy and paste this template into a new chat with an LLM to generate
 network audit checks for your Netaudit Flask app.
 
 Replace all <PLACEHOLDER> fields with the desired values.
+
+File path: checkprompt.py
 """
 
 CHECK_PROMPT_TEMPLATE = """

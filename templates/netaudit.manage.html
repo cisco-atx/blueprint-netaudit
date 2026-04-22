@@ -2,20 +2,28 @@
 
 {% block main %}
 
+<!-- External Stylesheets for CodeMirror and Markdown Rendering -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/darcula.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown.min.css">
+
+<!-- External Scripts for CodeMirror and Markdown Parsing -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Include common JavaScript for management-related operations -->
+<!-- Common JavaScript for management-related operations -->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.js') }}"></script>
 
-<!-- Header Row with Breadcrumbs and Action Buttons -->
-<div class="page-header">
-    <div class="breadcrumb">
+<!-- =========================
+     Page Header Section
+     Includes Breadcrumbs and Action Buttons
+     ========================= -->
+<header class="page-header">
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
         {% for crumb in breadcrumbs %}
         {% if not loop.last %}
         <a href="{{ crumb.url }}">{{ crumb.title }}</a>
@@ -24,93 +32,150 @@
         <span class="current">{{ crumb.title }}</span>
         {% endif %}
         {% endfor %}
-    </div>
+    </nav>
 
+    <!-- Action Buttons (Customizable via Block) -->
     {% block action_buttons %}
     <div class="actions">
+        <!-- Delete Selected Button (Hidden by Default) -->
         <button class="icon-text" id="deleteSelectedBtn" style="display:none;">
-            <span class="material-icons">delete_sweep</span>Delete Selected
+            <span class="material-icons">delete_sweep</span>
+            Delete Selected
         </button>
+
+        <!-- Open Modal Button -->
         <button class="icon-text" id="openModalBtn">
-            <span class="material-icons">{{ add_icon }}</span>{{ add_text }}
+            <span class="material-icons">{{ add_icon }}</span>
+            {{ add_text }}
         </button>
     </div>
     {% endblock %}
-</div>
 
-<!-- Data Table for Management -->
-<table class="display" id="manageDatatable" style="width:100%">
-    <thead>
-    <tr>
-        <th><input type="checkbox" id="selectAll"></th>
-        {% for col in columns %}
-        <th>{{ col }}</th>
+</header>
+
+<!-- =========================
+     Data Table Section
+     Displays Manageable Dataset
+     ========================= -->
+<section>
+    <table class="display" id="manageDatatable" style="width:100%">
+
+        <!-- Table Header -->
+        <thead>
+
+        <!-- Column Titles Row -->
+        <tr>
+            <th>
+                <input type="checkbox" id="selectAll">
+            </th>
+            {% for col in columns %}
+            <th>{{ col }}</th>
+            {% endfor %}
+            <th>Actions</th>
+        </tr>
+
+        <!-- Column Filter Inputs Row -->
+        <tr>
+            <th></th>
+            {% for col in columns %}
+            <th>
+                <input
+                        type="text"
+                        class="col-filter"
+                        data-col="{{ loop.index0 }}"
+                        placeholder="Filter {{ col }}"
+                >
+            </th>
+            {% endfor %}
+            <th></th>
+        </tr>
+
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+
+        <!-- Dynamic Table Content -->
+        {% block table_body %}
+        {% for data_item in dataset %}
+        <tr>
+
+            <!-- Row Selection Checkbox -->
+            <td>
+                <input
+                        type="checkbox"
+                        class="row-check"
+                        data-id="{{ data_item[columns[0]] }}"
+                >
+            </td>
+
+            <!-- Data Columns -->
+            {% for col in columns %}
+            <td>{{ data_item[col] }}</td>
+            {% endfor %}
+
+            <!-- Row Actions -->
+            <td>
+                <div class="actions">
+                    <button class="edit-btn icon-text">
+                        <span class="material-icons">edit_square</span>
+                        Edit
+                    </button>
+                    <button class="delete-btn icon-text">
+                        <span class="material-icons">delete</span>
+                        Delete
+                    </button>
+                </div>
+            </td>
+
+        </tr>
         {% endfor %}
-        <th>Actions</th>
-    </tr>
+        {% endblock %}
 
-    <tr>
-        <th></th>
-        {% for col in columns %}
-        <th>
-            <input type="text" class="col-filter" data-col="{{ loop.index0 }}" placeholder="Filter {{ col }}">
-        </th>
-        {% endfor %}
-        <th></th>
-    </tr>
-    </thead>
+        </tbody>
 
-    <tbody>
-    <!-- Table Body Content -->
-    {% block table_body %}
-    {% for data_item in dataset %}
-    <tr>
-        <td><input type="checkbox" class="row-check" data-id="{{ data_item[columns[0]] }}"></td>
-        {% for col in columns %}
-        <td>{{ data_item[col] }}</td>
-        {% endfor %}
-        <td>
-            <div class="actions">
-                <button class="edit-btn icon-text">
-                    <span class="material-icons">edit_square</span>Edit
-                </button>
-                <button class="delete-btn icon-text">
-                    <span class="material-icons">delete</span>Delete
-                </button>
-            </div>
-        </td>
-    </tr>
-    {% endfor %}
-    {% endblock %}
-    </tbody>
-</table>
+    </table>
+</section>
 
-<!-- Delete Confirmation Modal -->
+<!-- =========================
+     Delete Confirmation Modal
+     ========================= -->
 <div class="simple-modal-overlay" id="deleteConfirmModal">
     <div class="simple-modal-container">
         <form>
+
+            <!-- Modal Header -->
             <div class="simple-modal-header">
                 <div class="simple-modal-title">Confirm Delete</div>
                 <button class="close" id="closeDeleteModalBtn">
                     <span class="material-icons">close</span>
                 </button>
             </div>
+
+            <!-- Modal Body -->
             <div class="simple-modal-body">
                 <p>Are you sure you want to delete the selected row(s)?</p>
             </div>
+
+            <!-- Modal Footer -->
             <div class="simple-modal-footer">
                 <button class="icon-text" id="confirmDeleteBtn" type="button">
-                    <span class="material-icons">delete</span>Yes, Delete
+                    <span class="material-icons">delete</span>
+                    Yes, Delete
                 </button>
                 <button class="icon-text" id="cancelDeleteBtn" type="button">
-                    <span class="material-icons">close</span>Cancel
+                    <span class="material-icons">close</span>
+                    Cancel
                 </button>
             </div>
+
         </form>
     </div>
 </div>
 
-<!-- Placeholder for Additional Modals -->
+<!-- =========================
+     Additional Modals Placeholder
+     ========================= -->
 {% block modals %}{% endblock %}
 
 {% endblock %}

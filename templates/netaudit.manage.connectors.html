@@ -1,57 +1,107 @@
 {% extends "netaudit.manage.html" %}
 
-
 {% block modals %}
 
-<!-- Manage Connectors Modal -->
+<!--
+  =========================================================
+  Manage Connectors Modal
+  Includes external JS for modal behavior and interactions
+  =========================================================
+-->
 <script src="{{ url_for('netaudit.static', filename='js/netaudit.manage.connectors.js') }}"></script>
 
+<!-- Modal Overlay -->
 <div class="simple-modal-overlay" id="modalOverlay">
+
+    <!-- Modal Container -->
     <div class="simple-modal-container" style="width: 600px;">
 
+        <!-- Modal Header -->
         <div class="simple-modal-header">
-            <h5 class="simple-modal-title" id="modalTitle">Add Connector</h5>
+            <h5 class="simple-modal-title" id="modalTitle">
+                Add Connector
+            </h5>
+
+            <!-- Close Button -->
             <button class="close" id="closeModalBtn">
                 <span class="material-icons">close</span>
             </button>
         </div>
 
+        <!-- Modal Body -->
         <div class="simple-modal-body">
-            <form id="modalForm" class="form-grid" style="grid-template-columns: max-content 1fr auto;">
+
+            <!--
+              Form Grid Layout:
+              - Column 1: Labels
+              - Column 2: Inputs
+              - Column 3: Actions (e.g., password toggle)
+            -->
+            <form
+                    id="modalForm"
+                    class="form-grid"
+                    style="grid-template-columns: max-content 1fr auto;"
+            >
+
+                <!-- Connector Name -->
                 <label for="connectorName">Name</label>
                 <input type="text" id="connectorName" required>
                 <span></span>
 
+                <!-- Jumphost IP -->
                 <label for="connectorJumphostIp">Jumphost IP</label>
                 <input type="text" id="connectorJumphostIp">
                 <span></span>
 
+                <!-- Jumphost Username -->
                 <label for="connectorJumphostUser">Jumphost Username</label>
                 <input type="text" id="connectorJumphostUser">
                 <span></span>
 
+                <!-- Jumphost Password -->
                 <label for="connectorJumphostPassword">Jumphost Password</label>
                 <input type="password" id="connectorJumphostPassword">
-                <button type="button" class="toggle-password icon-only" data-target="#connectorJumphostPassword">
+                <button
+                        type="button"
+                        class="toggle-password icon-only"
+                        data-target="#connectorJumphostPassword"
+                >
                     <span class="material-icons">visibility</span>
                 </button>
 
+                <!-- Network Username -->
                 <label for="connectorNetUser">Network Username</label>
                 <input type="text" id="connectorNetUser" required>
                 <span></span>
 
+                <!-- Network Password -->
                 <label for="connectorNetPassword">Network Password</label>
                 <input type="password" id="connectorNetPassword">
-                <button type="button" class="toggle-password icon-only" data-target="#connectorNetPassword">
+                <button
+                        type="button"
+                        class="toggle-password icon-only"
+                        data-target="#connectorNetPassword"
+                >
                     <span class="material-icons">visibility</span>
                 </button>
+
             </form>
         </div>
 
+        <!-- Modal Footer -->
         <div class="simple-modal-footer">
-            <button class="icon-text" id="saveBtn" type="submit" form="modalForm">
-                <span class="material-icons">save</span>Save
+
+            <!-- Save Button (submits form) -->
+            <button
+                    class="icon-text"
+                    id="saveBtn"
+                    type="submit"
+                    form="modalForm"
+            >
+                <span class="material-icons">save</span>
+                Save
             </button>
+
         </div>
 
     </div>

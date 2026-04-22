@@ -315,6 +315,10 @@ table thead .col-filter {
   gap: 8px;
 }
 
+.test-dock-content .badge {
+  text-transform: none;
+}
+
 .test-dock-content .column-flex {
   display: flex;
   flex: 1 1 0;
