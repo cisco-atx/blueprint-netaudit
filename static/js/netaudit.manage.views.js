@@ -1,6 +1,16 @@
 /**
- * Handles the modal functionality and interactions for managing views and checks.
+ * netaudit.manage.views.js
+ *
+ * This JavaScript file manages the user interface for creating and editing "views" in the NetAudit application.
+ * A "view" is a collection of checks that users can define for monitoring purposes. The script handles:
+ * - Opening and closing a modal dialog for adding/editing views.
+ * - Fetching available checks from the server and populating dual listboxes for selection.
+ * - Submitting new or updated view data to the server via AJAX.
+ * - Providing user feedback on validation and errors during the save process.
+ *
+ * The script relies on jQuery for DOM manipulation and AJAX requests, and assumes certain HTML structure for modals and form elements.
  */
+
 $(document).ready(function () {
 
     // Initialize variables

@@ -1,7 +1,13 @@
 /**
- * manage_checks.js
- * Handles the Checks management functionality: CodeMirror editor setup, Add/Edit modal operations,
- * file browsing, and form submission for saving and generating checks.
+ * netaudit.manage.checks.js
+ *
+ * This JavaScript file manages the frontend interactions for the "Checks" management page in the NetAudit application.
+ * - Fetching and displaying checks data
+ * - Adding, editing, and exporting checks
+ * - Generating checks using AI
+ * - Testing checks with sample outputs
+ * - Managing Git repositories for checks
+ * - Displaying a check design guide
  */
 
 $(document).ready(function () {

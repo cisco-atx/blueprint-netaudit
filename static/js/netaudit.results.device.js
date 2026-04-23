@@ -1,7 +1,19 @@
 /**
- * JavaScript for handling device result table functionality, follow-up modal triggering,
- * and audit execution on individual devices.
+ * netaudit.results.device.js
+ *
+ * This JavaScript file is responsible for handling the interactions and functionalities
+ * related to the device results table in the NetAudit application. It initializes the
+ * DataTable for displaying device results, manages the opening and closing of modals
+ * for viewing raw logs and follow-up actions, and handles the initiation of audit processes
+ * and exporting of audit reports for individual devices.
+ *
+ * Main functionalities include:
+ * - Initializing the DataTable with specific configurations.
+ * - Handling click events for buttons to open modals and initiate actions.
+ * - Managing the user interface elements related to device results.
  */
+
+
 
 $(document).ready(function () {
     // Initialize the DataTable for device result table if it exists

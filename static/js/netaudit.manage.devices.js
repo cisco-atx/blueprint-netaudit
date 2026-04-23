@@ -1,7 +1,12 @@
 /**
- * manage_devices.js
- * Handles the functionality for the Devices management page, including modals, date selection,
- * and save/update actions.
+ * netaudit.manage.devices.js
+ *
+ * This JavaScript file provides the client-side functionality for managing devices
+ * in the NetAudit application. It handles the opening and closing of modals for
+ * adding and editing devices, populating form fields with existing device data,
+ * and submitting form data to the server via AJAX requests. The script also
+ * manages a custom dropdown for selecting views associated with each device.
+ * The script relies on jQuery for DOM manipulation and AJAX requests.
  */
 
 $(document).ready(function () {

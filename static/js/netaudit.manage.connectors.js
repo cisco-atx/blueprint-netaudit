@@ -1,7 +1,12 @@
 /**
- * manage_connectors.js
- * Handles the Connectors management page, including modal interactions,
- * password visibility toggle, and connector save/update functionalities.
+ * netaudit.manage.connectors.js
+ *
+ * This JavaScript file manages the Connectors section of the NetAudit application. It provides functionality to:
+ * - Open a modal form for adding new connectors.
+ * - Open a modal form for editing existing connectors, pre-populating fields with current data.
+ * - Validate connector names to prevent duplicates when adding new connectors.
+ * - Send connector data to the server via AJAX for saving or updating, and handle success or error responses appropriately.
+ * The script relies on jQuery for DOM manipulation and AJAX requests, and assumes a specific HTML structure for the connectors table and modal form.
  */
 
 $(document).ready(function () {

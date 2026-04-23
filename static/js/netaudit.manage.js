@@ -1,6 +1,13 @@
 /**
- * This script handles the initialization of a DataTable, row selection logic, and delete functionality,
- * including handling bulk and individual row deletion, as well as DOM updates for corresponding UI elements.
+ * netaudit.manage.js
+ *
+ * This JavaScript file manages the interactive functionalities of the netaudit management interface.
+ * It initializes a DataTable with features like state saving, fixed headers, and column-specific filtering.
+ * The script also handles bulk and individual deletion of items through a confirmation modal, ensuring a smooth user experience.
+ * Additionally, it includes utility functions for normalizing strings and checking for existing items in the table.
+ * The code is designed to work with a backend API for deleting items and updates the DataTable accordingly without requiring a page refresh.
+ * It also ensures that the bulk delete button is only visible when there are selected items, enhancing usability.
+ * Overall, this script provides essential client-side functionality for managing netaudit datasets effectively.
  */
 
 $(document).ready(function () {

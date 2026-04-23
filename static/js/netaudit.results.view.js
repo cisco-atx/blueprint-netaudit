@@ -1,3 +1,16 @@
+/**
+ * netaudit.results.view.js
+ *
+ * This JavaScript file manages the interactive functionalities of the NetAudit results view.
+ * It handles the display and filtering of audit results, as well as user interactions such as:
+ * - Toggling the views panel to select different audit views.
+ * - Filtering results based on column values.
+ * - Selecting multiple audit entries for follow-up actions, re-running audits, or exporting results.
+ * - Dynamically building and updating the results datatable based on the selected view and applied filters.
+ *
+ * The script ensures a responsive and user-friendly interface for navigating and managing audit results effectively.
+ */
+
 $(document).ready(function () {
 
     const viewsPanel = $("#viewsDockPanel");

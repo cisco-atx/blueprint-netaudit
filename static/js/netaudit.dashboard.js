@@ -1,7 +1,10 @@
 /**
- * dashboard.js
- * Manages dashboard charts including a Donut chart for pass/fail data
- * and a Timeline chart displaying audit results over time.
+ * netaudit.dashboard.js
+ *
+ * This JavaScript file is responsible for rendering the Donut Chart and Timeline Chart on the NetAudit dashboard using Chart.js.
+ * It listens for the DOMContentLoaded event to ensure that the charts are rendered after the HTML content is fully loaded.
+ * The data for both charts is expected to be provided in the global variables `donutData` and `timelineData`, which should be defined in the HTML template.
+ * The Donut Chart visualizes the pass/fail status of various checks, while the Timeline Chart shows trends over time for different views.
  */
 
 document.addEventListener('DOMContentLoaded', () => {

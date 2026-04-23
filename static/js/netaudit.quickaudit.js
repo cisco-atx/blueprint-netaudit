@@ -1,8 +1,12 @@
 /**
- * This script contains the main functionality for managing and auditing 
- * devices. It includes features for filtering checks, running audits, 
- * viewing reports, exporting data, and toggling UI elements like passwords 
- * and tooltips.
+ * netaudit.quickaudit.js
+ *
+ * This JavaScript file provides the client-side functionality for the Quick Audit feature
+ * of the NetAudit application. It handles user interactions such as filtering audit checks,
+ * initiating audits, displaying audit reports, and exporting results. The script uses jQuery
+ * for DOM manipulation and AJAX requests to communicate with the server-side API endpoints.
+ * It also integrates with DataTables for enhanced report display and includes dynamic tooltips
+ * for detailed check information.
  */
 
 $(function () {

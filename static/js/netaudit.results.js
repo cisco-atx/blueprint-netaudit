@@ -1,5 +1,12 @@
 /**
- * Handles device follow-up modal actions and audit run operations.
+ * netaudit.results.js
+ *
+ * This JavaScript file manages the user interactions for the NetAudit results page.
+ * It provides functionalities to:
+ * - Open and populate a follow-up modal for selected devices.
+ * - Start an audit flow for selected devices and views.
+ * - Export audit results for one or more devices.
+ * The script uses jQuery for DOM manipulation and AJAX requests to communicate with the backend API.
  */
 
 $(document).ready(function () {
