@@ -28,27 +28,29 @@ def get_dataset(dataset):
         logger.warning("Dataset not found: %s", dataset)
         return jsonify(error="Dataset not found"), 404
 
-    if dataset == "connectors":
-        connectors = dict(db)
-        for key, data in db.items():
-            for field in ["jumphost_password", "network_password"]:
-                if field in data:
-                    try:
-                        decrypted_value = current_app.cipher.decrypt(
-                            data[field]
-                        )
-                        connectors[key][field] = decrypted_value
-                    except Exception as exc:
-                        logger.exception(
-                            "Error decrypting %s for connector %s",
-                            field,
-                            key,
-                        )
-                        connectors[key][field] = None
-        return jsonify(connectors)
-
     return jsonify(dict(db))
 
+def get_decrypted_connectors():
+    """Fetches connectors with decrypted sensitive fields."""
+    netaudit_bp = current_app.blueprints.get("netaudit")
+    connectors = dict(netaudit_bp.connectors_db)
+
+    for key, data in connectors.items():
+        for field in ["jumphost_password", "network_password"]:
+            if field in data:
+                try:
+                    decrypted_value = current_app.cipher.decrypt(
+                        data[field]
+                    )
+                    connectors[key][field] = decrypted_value
+                except Exception as exc:
+                    logger.exception(
+                        "Error decrypting %s for connector %s",
+                        field,
+                        key,
+                    )
+                    connectors[key][field] = None
+    return jsonify(connectors)
 
 def delete_dataset_items(dataset):
     """Deletes specified items from the dataset."""

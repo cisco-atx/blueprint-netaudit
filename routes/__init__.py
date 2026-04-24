@@ -14,6 +14,7 @@ from flask import redirect, url_for, current_app
 from .api import (
     delete_dataset_items,
     get_dataset,
+    get_decrypted_connectors,
     get_device_results,
     save_dataset_item,
     save_device_results,
@@ -151,6 +152,14 @@ routes = [
         "endpoint": "api_get_dataset",
         "view_func": current_app.routes.login_required(
             get_dataset
+        ),
+        "methods": ["GET"],
+    },
+    {
+        "rule": "/api/decrypted_connectors",
+        "endpoint": "api_get_decrypted_connectors",
+        "view_func": current_app.routes.admin_required(
+            get_decrypted_connectors
         ),
         "methods": ["GET"],
     },

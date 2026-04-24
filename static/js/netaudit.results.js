@@ -189,3 +189,54 @@ $(document).ready(function () {
         closeFollowUpModal();
     });
 });
+
+
+/**
+ * Builds a device → full connector config map.
+ * Prompts user if any device lacks a connector.
+ */
+ensureDeviceConnectors = async function (deviceIds) {
+
+    // Load device store
+    const devRes = await fetch("/netaudit/api/devices");
+    if (!devRes.ok) throw new Error("Failed to load devices");
+    const devices = await devRes.json();
+
+    // Load connector store
+    const connRes = await fetch("/netaudit/api/decrypted_connectors");
+    if (!connRes.ok) throw new Error("Failed to load connectors");
+    const connectors = await connRes.json();
+
+    const deviceConnectorMap = {};
+    const missing = [];
+
+    deviceIds.forEach(deviceId => {
+        const connectorId = devices[deviceId]?.connector ?? null;
+
+        if (connectorId) {
+            const connectorConfig = connectors[connectorId];
+            if (!connectorConfig) {
+                throw new Error(`Connector '${connectorId}' not found`);
+            }
+            deviceConnectorMap[deviceId] = connectorConfig;
+        } else {
+            deviceConnectorMap[deviceId] = null;
+            missing.push(deviceId);
+        }
+    });
+
+    // All devices resolved
+    if (!missing.length) {
+        return deviceConnectorMap;
+    }
+
+    // Ask user for runtime connector
+    return new Promise((resolve) => {
+        RunModal.open(({ config }) => {
+            missing.forEach(deviceId => {
+                deviceConnectorMap[deviceId] = config;
+            });
+            resolve(deviceConnectorMap);
+        });
+    });
+};
