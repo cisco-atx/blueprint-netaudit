@@ -73,6 +73,7 @@ $(document).ready(function () {
      */
     $(document).on("click", "#exportAuditBtn", function () {
         const deviceId = $(this).data("id");
-        window.exportAuditResults([deviceId], this);
+        const view = $(this).data("view");
+        window.exportAuditResults([deviceId], view, this);
     });
 });

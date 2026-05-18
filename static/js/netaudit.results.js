@@ -99,7 +99,7 @@ $(document).ready(function () {
     /**
      * Export audit results for one or more devices
      */
-    function exportAuditResults(devices, btn = null) {
+    function exportAuditResults(devices, view, btn = null) {
         if (!devices.length) return;
 
         let originalHtml = null;
@@ -115,7 +115,10 @@ $(document).ready(function () {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ device_ids: devices })
+            body: JSON.stringify({
+                device_ids: devices,
+                view: view
+            })
         })
         .then(response => {
             if (!response.ok) throw new Error("Export failed");

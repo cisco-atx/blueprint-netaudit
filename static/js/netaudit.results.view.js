@@ -333,8 +333,8 @@ function openViewsPanel() {
                 return $(this).data("id");
             })
             .get();
-
-        window.exportAuditResults(selected, this);
+        const view = $("#results-viewtable").data('id');
+        window.exportAuditResults(selected, view, this);
     });
 
     window.loadAuditView = loadView;

@@ -113,6 +113,7 @@ def snap_results_for_devices():
     netaudit_bp = current_app.blueprints.get("netaudit")
     payload = request.get_json()
     device_ids = payload.get("device_ids", [])
+    view = payload.get("view")
 
     if not device_ids:
         return {"error": "No devices provided"}, 400
@@ -144,7 +145,7 @@ def snap_results_for_devices():
 
             html = render_template(
                 "netaudit.results.snap.html",
-                **get_results_for_device(device_id),
+                **get_results_for_device(device_id, view),
                 embed_local_assets=True,
                 get_static_file=get_static_file,
                 report_filename=html_filename,
@@ -164,10 +165,10 @@ def snap_results_for_devices():
     return response
 
 
-def get_results_for_device(device_id):
+def get_results_for_device(device_id, view=None):
     """Prepare rendering context for a specific device."""
     netaudit_bp = current_app.blueprints.get("netaudit")
-    view = request.args.get("view")
+    view = view or request.args.get("view")
 
     device_data = netaudit_bp.routes.get_device_results(
         device_id
