@@ -90,9 +90,7 @@ def delete_dataset_items(dataset):
                     netaudit_bp.views_db[view_name] = view_data
 
             try:
-                os.remove(
-                    os.path.join(netaudit_bp.RESULTS_DIR, key)
-                )
+                os.remove(os.path.join(netaudit_bp.RESULTS_DIR, f"{key}.sqlite"))
             except FileNotFoundError:
                 logger.warning("Device result file not found: %s", key)
 

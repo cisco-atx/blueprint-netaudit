@@ -111,12 +111,8 @@ class AuditService:
                 return socket.gethostbyaddr(device)[0]
             except socket.herror:
                 if conn:
-                    output = conn.sendCommand(
-                        "show running-config | include domain"
-                    )
-                    match = re.search(
-                        r"^ip domain[- ]name\s+(\S+)", output, re.M
-                    )
+                    output = conn.sendCommand("show running-config | include domain")
+                    match = re.search(r"^ip domain[- ]name\s+(\S+)", output, re.M)
                     if match:
                         return f"{conn.base_prompt}.{match.group(1)}"
                     return conn.base_prompt
@@ -146,31 +142,23 @@ class AuditService:
         }
 
         self.connectors[device] = self.obt_conn(device, connector)
-        self.results[device]["login"] = bool(
-            self.connectors[device]
-        )
+        self.results[device]["login"] = bool(self.connectors[device])
 
         if not self.connectors[device]:
-            logger.error(
-                "Skipping device '%s' due to connector failure", device
-            )
+            logger.error("Skipping device '%s' due to connector failure", device)
             self.results[device]["status"] = 2
             return
 
-        self.results[device]["hostname"] = self._get_device_fqdn(
-            device, self.connectors[device]
-        )
+        self.results[device]["hostname"] = self._get_device_fqdn(device, self.connectors[device])
+        self.context["hostname"] = self.results[device]["hostname"]
 
         if self.gatherers:
-            self.results[device]["facts"] = self.gather_facts(
-                self.connectors[device]
-            )
+            self.results[device]["facts"] = self.gather_facts(self.connectors[device])
+            self.context["facts"] = self.results[device]["facts"]
 
         for check_file in check_list:
             try:
-                check_inst = self.get_check_instance(
-                    check_file, device
-                )
+                check_inst = self.get_check_instance(check_file, device)
                 last_request = None
 
                 while check_inst.REQUESTS:
@@ -188,49 +176,31 @@ class AuditService:
 
                     if key not in self.results[device]["raw"]:
                         if not self.connectors.get(req_device):
-                            self.connectors[req_device] = self.obt_conn(
-                                req_device, connector
-                            )
+                            self.connectors[req_device] = self.obt_conn(req_device, connector)
 
                         if not self.connectors[req_device]:
                             logger.error(
-                                "Connector failed for '%s' during "
-                                "check '%s' on '%s'",
+                                "Connector failed for '%s' during check '%s' on '%s'",
                                 req_device,
                                 check_file,
                                 device,
                             )
                             break
 
-                        output = self.connectors[
-                            req_device
-                        ].sendCommand(req_cmd)
+                        output = self.connectors[req_device].sendCommand(req_cmd)
                         self.results[device]["raw"][key] = output
                     else:
                         output = self.results[device]["raw"][key]
 
-                    getattr(check_inst, handler_name)(
-                        req_device, req_cmd, output
-                    )
+                    getattr(check_inst, handler_name)(output)
                     last_request = current_request
 
-                self.results[device]["checks"][
-                    check_file
-                ] = check_inst.RESULTS
+                self.results[device]["checks"][check_file] = check_inst.RESULTS
 
-                logger.debug(
-                    "Check '%s' completed for '%s'",
-                    check_file,
-                    device,
-                )
+                logger.debug("Check '%s' completed for '%s'", check_file, device)
 
             except Exception as exc:
-                logger.exception(
-                    "Error executing check '%s' on '%s': %s",
-                    check_file,
-                    device,
-                    exc,
-                )
+                logger.exception("Error executing check '%s' on '%s': %s", check_file, device, exc)
 
         self.results[device]["status"] = 1
         for check_result in self.results[device]["checks"].values():
@@ -243,26 +213,20 @@ class AuditService:
     def load_facts(self):
         """Load fact-gathering functions from directory."""
         for facts_module in os.listdir(self.facts_dir):
-            if not facts_module.endswith(".py") or facts_module.startswith(
-                    "__"
-            ):
+            if not facts_module.endswith(".py") or facts_module.startswith("__"):
                 continue
 
             path = os.path.join(self.facts_dir, facts_module)
             module_name = facts_module.replace(".py", "")
 
-            spec = importlib.util.spec_from_file_location(
-                module_name, path
-            )
+            spec = importlib.util.spec_from_file_location(module_name, path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
             for _, func in inspect.getmembers(
                     module, inspect.isfunction
             ):
-                match = re.match(
-                    r"^gather_([a-zA-Z0-9_]+)$", func.__name__
-                )
+                match = re.match(r"^gather_([a-zA-Z0-9_]+)$", func.__name__)
                 if not match:
                     continue
 
@@ -273,11 +237,8 @@ class AuditService:
                     "name": name,
                     "func": func,
                     "path": path,
-                    "description": inspect.getdoc(func)
-                                   or "No description.",
-                    "code": textwrap.dedent(
-                        inspect.getsource(func)
-                    ),
+                    "description": inspect.getdoc(func) or "No description.",
+                    "code": textwrap.dedent(inspect.getsource(func))
                 }
 
     def gather_facts(self, conn):
@@ -291,8 +252,6 @@ class AuditService:
                 if isinstance(result, dict):
                     facts.update(result)
             except Exception as exc:
-                logger.error(
-                    "Error running gatherer '%s': %s", name, exc
-                )
+                logger.error("Error running gatherer '%s': %s", name, exc)
 
         return facts

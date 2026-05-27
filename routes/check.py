@@ -209,8 +209,12 @@ def run_handler():
         handler_name = check.REQUESTS.get("handler")
         if not handler_name:
             return jsonify(
-                {"error": "No handler defined in REQUESTS"}
-            ), 400
+                {
+                    "session_id": session_id,
+                    "results": check.RESULTS,
+                    "requests": check.REQUESTS,
+                }
+            )
 
         if not hasattr(check, handler_name):
             return jsonify(
@@ -218,9 +222,7 @@ def run_handler():
             ), 400
 
         handler = getattr(check, handler_name)
-        req = check.REQUESTS
-
-        handler(req["device"], req["command"], sample_output)
+        handler(sample_output)
 
         return jsonify(
             {
