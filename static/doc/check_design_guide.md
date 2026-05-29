@@ -213,7 +213,7 @@ self.REQUESTS = {
 
 ```python
 handler = getattr(check, REQUESTS["handler"])
-handler(device, command, output)
+handler(output)
 ```
 
 
@@ -270,13 +270,11 @@ self.RESULTS = {
 ### 7.1 Signature
 
 ```python
-def handle_initial(self, device, command, output):
+def handle_initial(self, output):
     # Parse output
     pass
 ```
 
-- **device:** `str`
-- **command:** `str`
 - **output:** `str` (raw CLI output)
 
 Handlers:
