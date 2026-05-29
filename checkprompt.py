@@ -62,7 +62,7 @@ Framework Context:
 6. Handlers:
    - Handlers are methods inside the class.
    - Signature:
-       handler(self, device: str, command: str, output: str)
+       handler(self, output: str)
    - Use Python standard libraries only (especially `re`).
    - Update RESULTS inside handlers.
    - Clear REQUESTS (set to None) when the check is complete.
@@ -118,7 +118,7 @@ class ExampleCheck:
             "comments": []
         }
 
-    def handle_initial(self, device, cmd, output):
+    def handle_initial(self, output):
         # Analyze output, update RESULTS, optionally append new REQUESTS
         pass
 
