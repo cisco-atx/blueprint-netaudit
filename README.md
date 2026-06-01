@@ -1,6 +1,6 @@
-<p>
+<div>
 <img src="https://raw.githubusercontent.com/cisco-atx/blueprint-netaudit/refs/heads/main/netaudit.ico" width="64">
-</p>
+</div>
 
 # NetAudit
 >Network Auditing and Compliance
