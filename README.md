@@ -1,5 +1,5 @@
 <p>
-<img src="https://raw.githubusercontent.com/cisco-atx/blueprint-netaudit/refs/heads/main/static/img/netaudit.ico" width="64">
+<img src="https://raw.githubusercontent.com/cisco-atx/blueprint-netaudit/refs/heads/main/netaudit.ico" width="64">
 </p>
 
 # NetAudit
