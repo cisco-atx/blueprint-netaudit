@@ -30,7 +30,7 @@ class AuditService:
         """Initialize the AuditService."""
         self.devices = devices
         self.checks_dir = check_dir
-        self.context = context
+        self.context = context or {}
         self.facts_dir = facts_dir
         self.results = {}
         self.connectors = {}
@@ -40,7 +40,7 @@ class AuditService:
         if self.facts_dir:
             self.load_facts()
 
-    def get_check_instance(self, check_file, device):
+    def get_check_instance(self, check_file, device, context):
         """Load and return an instance of a check class."""
         file_path = os.path.join(self.checks_dir, check_file)
         module_name = file_path.replace(".py", "")
@@ -51,7 +51,7 @@ class AuditService:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        return getattr(module, "CHECK_CLASS")(device, self.context)
+        return getattr(module, "CHECK_CLASS")(device, context)
 
     def obt_conn(self, device, connector):
         """Establish a network connection to a device."""
@@ -150,15 +150,17 @@ class AuditService:
             return
 
         self.results[device]["hostname"] = self._get_device_fqdn(device, self.connectors[device])
-        self.context["hostname"] = self.results[device]["hostname"]
 
         if self.gatherers:
             self.results[device]["facts"] = self.gather_facts(self.connectors[device])
-            self.context["facts"] = self.results[device]["facts"]
+
+        context = self.context.copy()
+        context["hostname"] = self.results[device]["hostname"]
+        context["facts"] = self.results[device]["facts"]
 
         for check_file in check_list:
             try:
-                check_inst = self.get_check_instance(check_file, device)
+                check_inst = self.get_check_instance(check_file, device, context)
                 last_request = None
 
                 while check_inst.REQUESTS:
