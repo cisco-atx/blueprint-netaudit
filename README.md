@@ -8,11 +8,8 @@
 ## Overview
 
 NetAudit is a network auditing and compliance validation module within the ATX (Automation Tooling) platform.
-
 It is designed to automate device audits, compliance checks, operational validation, and migration readiness assessments across enterprise network environments.
-
 NetAudit enables network engineers to create reusable audit checks, organize devices into logical audit groups, execute validations at scale, and generate actionable compliance reports.
-
 By automating repetitive audit activities, NetAudit helps reduce migration risk, improve consistency, and accelerate network transformation projects.
 
 ---
