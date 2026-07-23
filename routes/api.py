@@ -12,9 +12,11 @@ File: routes/api.py
 import datetime
 import logging
 import os
+import tempfile
 
-from flask import current_app, jsonify, request, session
+from flask import current_app, jsonify, request, session, send_file
 from sqlitedict import SqliteDict
+from netcore import XLBW
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,30 @@ def get_dataset(dataset):
         return jsonify(error="Dataset not found"), 404
 
     return jsonify(dict(db))
+
+def export_dataset(dataset):
+    """Export the dataset as an excel file"""
+    netaudit_bp = current_app.blueprints.get("netaudit")
+    db = getattr(netaudit_bp, f"{dataset}_db", None)
+
+    if db is None:
+        logger.warning("Dataset not found: %s", dataset)
+        return jsonify(error="Dataset not found"), 404
+
+    export_id = f"{dataset.title()}_{datetime.datetime.now().strftime('%Y-%m-%d_%H.%M')}.xlsx"
+    export_path = os.path.join(tempfile.gettempdir(), export_id)
+
+    xl = XLBW(export_path)
+    xl.dump(dict(db), index=dataset[:-1])
+    xl.close()
+
+    # Send the file as a response
+    return send_file(
+        export_path,
+        as_attachment=True,
+        download_name=export_id,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 def get_decrypted_connectors():
     """Fetches connectors with decrypted sensitive fields."""

@@ -54,6 +54,11 @@ $(document).ready(function () {
         deleteSelectedBtn.style.display = checkedCount > 0 ? "inline-flex" : "none";
     }
 
+    // Export as excel
+    $('#exportBtn').on('click', function () {
+        window.location = '/netaudit/api/' + window.datasetName + '/export_excel';
+    });
+
     // Monitor changes to individual row checkboxes and adjust the bulk delete button
     $(document).on("change", ".row-check", toggleDeleteBtn);
 

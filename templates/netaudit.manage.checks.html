@@ -21,6 +21,12 @@
         Repositories
     </button>
 
+    <!-- Export as Excel -->
+    <button class="icon-text" id="exportBtn">
+        <span class="material-icons">file_download</span>
+        Export as Excel
+    </button>
+
     <!-- Open Add/Edit Check Modal -->
     <button class="icon-text" id="openModalBtn">
         <span class="material-icons">add_task</span>
@@ -34,7 +40,12 @@
 <!-- Global Script Variables -->
 <script>
     const authorName = "{{ session.get('username', 'Unknown User') }}";
-    const statusCodes = {{ status_codes | tojson }};
+    const statusCodes = {
+    {
+        status_codes | tojson
+    }
+    }
+    ;
 </script>
 
 <!-- External JavaScript for Check Management -->

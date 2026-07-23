@@ -14,6 +14,7 @@ from flask import redirect, url_for, current_app
 from .api import (
     delete_dataset_items,
     get_dataset,
+    export_dataset,
     get_decrypted_connectors,
     get_device_results,
     save_dataset_item,
@@ -152,6 +153,14 @@ routes = [
         "endpoint": "api_get_dataset",
         "view_func": current_app.routes.login_required(
             get_dataset
+        ),
+        "methods": ["GET"],
+    },
+    {
+        "rule": "/api/<dataset>/export_excel",
+        "endpoint": "api_export_dataset_excel",
+        "view_func": current_app.routes.login_required(
+            export_dataset
         ),
         "methods": ["GET"],
     },
